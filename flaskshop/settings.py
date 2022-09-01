@@ -84,3 +84,18 @@ class Config:
     MAIL_PASSWORD = os.getenv("MAIL_PASSWORD", "")
     MAIL_DEFAULT_SENDER = os.getenv("MAIL_DEFAULT_SENDER", "")
     GA_MEASUREMENT_ID = os.getenv("GA_MEASUREMENT_ID", "")
+
+
+class TestConfig(Config):
+    pass
+    # SQLALCHEMY_DATABASE_URI = "sqlite:///" + str(
+    #     (Path(__file__).parent / "database-test.sqlite3")
+    # )
+
+
+class DevConfig(Config):
+    pass
+
+
+class ProdConfig(Config):
+    pass
