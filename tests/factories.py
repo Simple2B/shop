@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Factories to help in tests."""
-from factory import PostGenerationMethodCall, Sequence
+from factory import Sequence
 from factory.alchemy import SQLAlchemyModelFactory
 
 from flaskshop.database import db
@@ -24,7 +24,7 @@ class UserFactory(BaseFactory):
     email = Sequence(lambda n: "user{0}@example.com".format(n))
     password = Sequence(lambda n: "user{0}".format(n))
     # password = PostGenerationMethodCall('set_password', 'example')
-    active = True
+    is_active = True
 
     class Meta:
         """Factory configuration."""
