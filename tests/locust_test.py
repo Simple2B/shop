@@ -1,4 +1,4 @@
-from locust import HttpLocust, TaskSet, task
+from locust import HttpUser, TaskSet, task
 
 
 class WebsiteTasks(TaskSet):
@@ -14,7 +14,7 @@ class WebsiteTasks(TaskSet):
         self.client.get("/page/about")
 
 
-class WebsiteUser(HttpLocust):
+class WebsiteUser(HttpUser):
     task_set = WebsiteTasks
     host = "http://127.0.0.1:5000"
     min_wait = 1000
