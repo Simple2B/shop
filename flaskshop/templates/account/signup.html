@@ -1,5 +1,6 @@
+<!-- prettier-ignore -->
 {% extends "no_nav_base.html" %}
-{% from 'bootstrap/form.html' import render_field %}
+{% from 'bootstrap4/form.html' import render_field %}
 {% block title %}Sign Up{% endblock %}
 
 {% block content %}
@@ -8,16 +9,26 @@
     <div class="col-md-6 login__register">
       <div class="login__register-link">
         <h3>{% trans %}Already have an account?{% endtrans %}</h3>
-        <img class="signup-img lazyload lazypreload" data-src="{{ url_for('static', filename='img/login-bg.png') }}">
-        <p><a rel="nofollow" href="{{ url_for('account.login') }}" class="btn secondary narrow">
+        <img
+          class="signup-img lazyload lazypreload"
+          data-src="{{ url_for('static', filename='img/login-bg.png') }}"
+        />
+        <p>
+          <a
+            rel="nofollow"
+            href="{{ url_for('account.login') }}"
+            class="btn secondary narrow"
+          >
             {% trans %}Log in{% endtrans %}
-          </a></p>
+          </a>
+        </p>
       </div>
     </div>
     <div class="col-md-6 login__form">
       <form method="post" action="" id="registerForm">
         <fieldset>
           <h3>{% trans %}Create an account{% endtrans %}</h3>
+          <!-- prettier-ignore -->
           {{ form.csrf_token }}
           {{ render_field(form.username) }}
           {{ render_field(form.email) }}
