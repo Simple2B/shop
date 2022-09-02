@@ -60,3 +60,4 @@ migrations/
 /women_shop_empty.backup
 /.env
 .DS_Store
+/*.sqlite3

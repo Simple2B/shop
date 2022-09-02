@@ -127,7 +127,7 @@ class TestRegistering:
         ("123", ValidationError),
         ("+48123456789", None),
         ("+12025550169", None),
-        ("+481234567890", ValidationError),
+        ("+4a81234567890", ValidationError),
         ("testext", ValidationError),
     ],
 )

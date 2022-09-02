@@ -1,7 +1,11 @@
 import pkg_resources
 from flask import current_app
-from jinja2 import Markup
+
+# from jinja2 import Markup
 from email import message_from_string
+
+# import jinja2as Markup
+from jinja2.utils import markupsafe
 
 
 class TemplateEventResult(list):
@@ -37,7 +41,7 @@ def template_hook(name, silent=True, is_markup=True, **kwargs):
         raise
 
     if is_markup:
-        return Markup(result)
+        return markupsafe.Markup(result)
 
     return result
 

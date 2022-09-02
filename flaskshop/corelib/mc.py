@@ -15,7 +15,8 @@ def gen_key_factory(key_pattern, arg_names, defaults):
     args = dict(zip(arg_names[-len(defaults) :], defaults)) if defaults else {}  # noqa
 
     if callable(key_pattern):
-        names = inspect.getargspec(key_pattern)[0]
+        f_spec = inspect.getfullargspec(key_pattern)
+        names = f_spec.args
 
     def gen_key(*a, **kw):
         aa = args.copy()
@@ -32,7 +33,13 @@ def gen_key_factory(key_pattern, arg_names, defaults):
 
 def cache(key_pattern, expire=None):
     def deco(f):
-        arg_names, varargs, varkw, defaults = inspect.getargspec(f)
+        f_spec = inspect.getfullargspec(f)
+        arg_names, varargs, varkw, defaults = (
+            f_spec.args,
+            f_spec.varargs,
+            f_spec.varkw,
+            f_spec.defaults,
+        )
         if varargs or varkw:
             raise Exception("do not support varargs")
         gen_key = gen_key_factory(key_pattern, arg_names, defaults)
@@ -74,7 +81,13 @@ def cache(key_pattern, expire=None):
 
 def cache_by_args(key_pattern, expire=None):
     def deco(f):
-        arg_names, varargs, varkw, defaults = inspect.getargspec(f)
+        f_spec = inspect.getfullargspec(f)
+        arg_names, varargs, varkw, defaults = (
+            f_spec.args,
+            f_spec.varargs,
+            f_spec.varkw,
+            f_spec.defaults,
+        )
         if varargs or varkw:
             raise Exception("do not support varargs")
         gen_key = gen_key_factory(key_pattern, arg_names, defaults)

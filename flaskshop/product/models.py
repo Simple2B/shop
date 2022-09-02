@@ -24,10 +24,10 @@ class Product(Model):
     __tablename__ = "product_product"
     title = Column(db.String(255), nullable=False)
     on_sale = Column(db.Boolean(), default=True)
-    rating = Column(db.DECIMAL(8, 2), default=5.0)
+    rating = Column(db.Float(), default=5.0)
     sold_count = Column(db.Integer(), default=0)
     review_count = Column(db.Integer(), default=0)
-    basic_price = Column(db.DECIMAL(10, 2))
+    basic_price = Column(db.Float())
     category_id = Column(db.Integer())
     is_featured = Column(db.Boolean(), default=False)
     product_type_id = Column(db.Integer())
