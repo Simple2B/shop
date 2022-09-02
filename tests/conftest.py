@@ -38,6 +38,7 @@ def db(app):
     """A database for the tests."""
     _db.app = app
     with app.app_context():
+        _db.drop_all()
         _db.create_all()
         for msg in create_menus():
             print(msg)

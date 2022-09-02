@@ -9,7 +9,7 @@ class TestRegisterForm:
 
     def test_validate_user_already_registered(self, user):
         """Enter username that is already registered."""
-        # user = User.query.first()
+
         form = RegisterForm(
             username=user.username,
             email="foo@bar.com",

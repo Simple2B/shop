@@ -141,10 +141,10 @@ class UnLockedAlchemy(SQLAlchemy):
         model.query = _QueryProperty(self)
         return model
 
-    def apply_driver_hacks(self, app, info, options):
-        if "isolation_level" not in options:
-            options["isolation_level"] = "READ COMMITTED"
-        return super().apply_driver_hacks(app, info, options)
+    # def apply_driver_hacks(self, app, info, options):
+    #     if "isolation_level" not in options:
+    #         options["isolation_level"] = "READ COMMITTED"
+    #     return super().apply_driver_hacks(app, info, options)
 
 
 db = UnLockedAlchemy(model_class=BaseModel)

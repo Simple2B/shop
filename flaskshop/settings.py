@@ -87,15 +87,18 @@ class Config:
 
 
 class TestConfig(Config):
-    pass
-    # SQLALCHEMY_DATABASE_URI = "sqlite:///" + str(
-    #     (Path(__file__).parent / "database-test.sqlite3")
-    # )
+    SQLALCHEMY_DATABASE_URI = "sqlite:///" + str(
+        (Path(__file__).parent.parent / "database-test.sqlite3")
+    )
+    WTF_CSRF_ENABLED = False
 
 
 class DevConfig(Config):
-    pass
+    ENV = "dev"
+    DEBUG = True
 
 
 class ProdConfig(Config):
-    pass
+    ENV = "prod"
+    DEBUG = False
+    DEBUG_TB_ENABLED = False
