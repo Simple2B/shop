@@ -1,3 +1,4 @@
+from decimal import Decimal
 import itertools
 
 from flask import url_for, request, current_app
@@ -84,7 +85,7 @@ class Product(Model):
     @property
     def price(self):
         if self.is_discounted:
-            return self.basic_price - self.discounted_price
+            return round(Decimal(self.basic_price) - self.discounted_price, 2)
         return self.basic_price
 
     @property

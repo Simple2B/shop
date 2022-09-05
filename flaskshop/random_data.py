@@ -4,6 +4,7 @@ import unicodedata
 from uuid import uuid4
 import os
 
+from decimal import Decimal
 from faker import Factory
 from faker.providers import BaseProvider
 from sqlalchemy.sql.expression import func
@@ -166,7 +167,7 @@ def get_price_override(schema, combinations_num, current_price):
     if schema.get("different_variant_prices"):
         prices = sorted(
             [
-                current_price + fake.pydecimal(2, 2, positive=True)
+                round(Decimal(current_price) + fake.pydecimal(2, 2, positive=True), 2)
                 for _ in range(combinations_num)
             ],
             reverse=True,
