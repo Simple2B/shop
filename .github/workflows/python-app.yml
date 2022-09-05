@@ -14,8 +14,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.8, 3.9, 3.10]
-        poetry-version: [1.1.9, 1.1.13]
+        python-version: ["3.9", "3.10"]
+        poetry-version: ["1.1.9", "1.1.13"]
         os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
 
@@ -32,10 +32,10 @@ jobs:
       - name: Install dependencies
         run: |
           poetry install
-      - name: Lint with flake8
-        run: |
-          poetry run flake8 . --count --show-source --statistics
-          poetry run flake8 . --count --exit-zero --max-complexity=10 --statistics
+      # - name: Lint with flake8
+      #   run: |
+      #     poetry run flake8 . --count --show-source --statistics
+      #     poetry run flake8 . --count --exit-zero --max-complexity=10 --statistics
       - name: Run Flask tests
         run: |
           poetry run pytest
