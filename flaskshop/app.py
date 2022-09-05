@@ -4,7 +4,7 @@ import sys
 
 from flask import Flask, render_template
 from flask_babel import Babel
-from werkzeug.wsgi import DispatcherMiddleware
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from flask_ckeditor import CKEditor
 from flask_migrate import Migrate
 from flask_mail import Mail
@@ -32,7 +32,8 @@ from .public import views as public_view
 from .product import views as product_view
 from .order import views as order_view
 from .dashboard import views as dashboard_view
-from .api import api as api_view
+
+# from .api import api as api_view
 from .dashboard_api.api_app import dashboard_api
 
 babel = Babel()

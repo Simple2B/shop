@@ -11,6 +11,7 @@ from flaskshop.random_data import create_menus
 from flaskshop.utils import jinja_global_varibles
 
 from .factories import UserFactory
+from .consts import TEST_USER_PASSWORD
 
 
 @pytest.fixture
@@ -37,6 +38,7 @@ def db(app):
     """A database for the tests."""
     _db.app = app
     with app.app_context():
+        _db.drop_all()
         _db.create_all()
         for msg in create_menus():
             print(msg)
@@ -51,6 +53,6 @@ def db(app):
 @pytest.fixture
 def user(db):
     """A user for the tests."""
-    user = UserFactory(password="myprecious")
+    user = UserFactory(password=TEST_USER_PASSWORD)
     db.session.commit()
     return user

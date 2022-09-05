@@ -153,7 +153,7 @@ class Sale(Model):
         if sale.discount_value_type == DiscountValueTypeKinds.fixed.value:
             return sale.discount_value
         elif sale.discount_value_type == DiscountValueTypeKinds.percent.value:
-            price = product.basic_price * sale.discount_value / 100
+            price = round(Decimal(product.basic_price) * sale.discount_value / 100, 2)
             return Decimal(price).quantize(Decimal("0.00"))
 
     @property

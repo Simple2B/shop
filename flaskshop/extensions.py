@@ -6,7 +6,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect
-from flask_bootstrap import Bootstrap
+from flask_bootstrap import Bootstrap4
 from flask_sqlalchemy import SQLAlchemy, Model, BaseQuery, DefaultMeta, _QueryProperty
 from sqlalchemy import Column, Integer, DateTime, event
 from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
@@ -19,7 +19,7 @@ csrf_protect = CSRFProtect()
 login_manager = LoginManager()
 migrate = Migrate(compare_type=True)
 debug_toolbar = DebugToolbarExtension()
-bootstrap = Bootstrap()
+bootstrap = Bootstrap4()
 
 
 class BaseModel(PropsMixin, Model):
@@ -141,10 +141,10 @@ class UnLockedAlchemy(SQLAlchemy):
         model.query = _QueryProperty(self)
         return model
 
-    def apply_driver_hacks(self, app, info, options):
-        if "isolation_level" not in options:
-            options["isolation_level"] = "READ COMMITTED"
-        return super().apply_driver_hacks(app, info, options)
+    # def apply_driver_hacks(self, app, info, options):
+    #     if "isolation_level" not in options:
+    #         options["isolation_level"] = "READ COMMITTED"
+    #     return super().apply_driver_hacks(app, info, options)
 
 
 db = UnLockedAlchemy(model_class=BaseModel)

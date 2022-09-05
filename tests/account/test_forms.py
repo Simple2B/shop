@@ -9,6 +9,7 @@ class TestRegisterForm:
 
     def test_validate_user_already_registered(self, user):
         """Enter username that is already registered."""
+
         form = RegisterForm(
             username=user.username,
             email="foo@bar.com",
@@ -32,7 +33,7 @@ class TestRegisterForm:
         """Register with success."""
         form = RegisterForm(
             username="newusername",
-            email="new@test.test",
+            email="test1new@test.com",
             password="example",
             confirm="example",
         )
@@ -67,7 +68,7 @@ class TestLoginForm:
 
     def test_validate_inactive_user(self, user):
         """Inactive user."""
-        user.active = False
+        user.is_active = False
         user.password = "example"
         user.save()
         # Correct username and password, but user is not activated

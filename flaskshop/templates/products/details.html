@@ -1,5 +1,6 @@
+<!-- prettier-ignore -->
 {% extends "base.html" %}
-{% from 'bootstrap/form.html' import render_field %}
+{% from 'bootstrap4/form.html' import render_field %}
 
 {% block title %}
 {{ product.name }}
@@ -9,66 +10,96 @@
 {% block breadcrumb %}
 <ul class="breadcrumbs list-unstyled">
   <li>
-    <a href="{{ url_for('public.home') }}">
-      Home
-    </a>
+    <a href="{{ url_for('public.home') }}"> Home </a>
   </li>
   {% if product.category %}
   <li>
-    <a href="{{ product.category.get_absolute_url() }}">{{ product.category }}</a>
+    <a href="{{ product.category.get_absolute_url() }}"
+      >{{ product.category }}</a
+    >
   </li>
   {% endif %}
   <li>
     <a href="{{ product.get_absolute_url() }}">{{ product }}</a>
   </li>
 </ul>
-{% endblock breadcrumb %}
-
-{% block content %}
+{% endblock breadcrumb %} {% block content %}
 
 <div class="row product">
-
   <div class="col-md-6 col-12 product__gallery">
+    <!-- prettier-ignore -->
     {% with images=product.images %}
     {% if images %}
     <div id="carousel-example-generic" class="carousel slide">
       <div class="carousel-inner" role="listbox">
+        <!-- prettier-ignore -->
         {% for image in images %}
         <div class="carousel-item{% if loop.first %} active{% endif %}">
-          <img class="d-block img-fluid lazyload lazypreload" alt="" src="{{ image }}" data-src="{{ image }}"
-            width=255 />
+          <img
+            class="d-block img-fluid lazyload lazypreload"
+            alt=""
+            src="{{ image }}"
+            data-src="{{ image }}"
+            width="255"
+          />
         </div>
         {% endfor %}
       </div>
       {% if images|length > 1 %}
-      <a class="carousel-control-prev" href="#carousel-example-generic" role="button" data-slide="prev">
-        <svg data-src="{{ url_for('static', filename='img/gallery-arrow.svg') }}"></svg>
+      <a
+        class="carousel-control-prev"
+        href="#carousel-example-generic"
+        role="button"
+        data-slide="prev"
+      >
+        <svg
+          data-src="{{ url_for('static', filename='img/gallery-arrow.svg') }}"
+        ></svg>
       </a>
-      <a class="carousel-control-next" href="#carousel-example-generic" role="button" data-slide="next">
-        <svg data-src="{{ url_for('static', filename='img/gallery-arrow.svg') }}"></svg>
+      <a
+        class="carousel-control-next"
+        href="#carousel-example-generic"
+        role="button"
+        data-slide="next"
+      >
+        <svg
+          data-src="{{ url_for('static', filename='img/gallery-arrow.svg') }}"
+        ></svg>
       </a>
       {% endif %}
       <ol class="carousel-indicators d-none d-md-block">
+        <!-- prettier-ignore -->
         {% for image in images %}
         {% if images|length > 1 %}
-        <li data-target="#carousel-example-generic" data-slide-to="{{ loop.index - 1 }}" {% if loop.first %}
-          class="active" {% endif %}>
-          <img class="lazyload lazypreload" src="{{ image }}" data-src="{{ image }}">
+        <li
+          data-target="#carousel-example-generic"
+          data-slide-to="{{ loop.index - 1 }}"
+          {%
+          if
+          loop.first
+          %}
+          class="active"
+          {%
+          endif
+          %}
+        >
+          <img
+            class="lazyload lazypreload"
+            src="{{ image }}"
+            data-src="{{ image }}"
+          />
         </li>
+        <!-- prettier-ignore -->
         {% endif %}
         {% endfor %}
       </ol>
     </div>
     {% else %}
-    <img alt="" class="img-fluid lazyload lazypreload">
-    {% endif %}
-    {% endwith %}
+    <img alt="" class="img-fluid lazyload lazypreload" />
+    {% endif %} {% endwith %}
   </div>
   <div class="col-md-6 col-12 product__info">
-    <h1 class="product__info__name">
-      {{ product }}
-    </h1>
-
+    <h1 class="product__info__name">{{ product }}</h1>
 
     <h2 class="product__info__price">
       <span class="text-info">$ {{product.price}}</span>
@@ -77,19 +108,26 @@
         {{product.basic_price}}
       </small>
       {% endif %}
-      <small class="stock">
-
-      </small>
+      <small class="stock"> </small>
     </h2>
 
+    <!-- prettier-ignore -->
     {% if product.on_sale %}
     {% block orderform %}
-    <form id="product-form" role="form" class="product-form1 clearfix" method="post"
-      action="{{ url_for('product.product_add_to_cart', id=product.id) }}">
+    <form
+      id="product-form"
+      role="form"
+      class="product-form1 clearfix"
+      method="post"
+      action="{{ url_for('product.product_add_to_cart', id=product.id) }}"
+    >
       {{ form.csrf_token }}
+      <!-- prettier-ignore -->
       {% if form.variant.choices | length > 1 %}
       <div class="variant-picker">
-        <div class="variant-picker__label">{{ form.variant.label.text|safe }}</div>
+        <div class="variant-picker__label">
+          {{ form.variant.label.text|safe }}
+        </div>
         <div class="btn-group" data-toggle="buttons">
           {% for item in form.variant -%}
           <label class="btn btn-secondary variant-picker__option">
@@ -97,16 +135,23 @@
           </label>
           {% endfor %}
         </div>
-         {% if form.variant.errors %}
-        <div class="is-invalid "></div>
-        <div class="invalid-feedback">{% trans %}Please choose a variant!{% endtrans %}</div>
+        {% if form.variant.errors %}
+        <div class="is-invalid"></div>
+        <div class="invalid-feedback">
+          {% trans %}Please choose a variant!{% endtrans %}
+        </div>
         {% endif %}
       </div>
+      <!-- prettier-ignore -->
       {% else %}
       {% for item in form.variant -%}
-      <label class="btn btn-secondary variant-picker__option active" style="display: none">
+      <label
+        class="btn btn-secondary variant-picker__option active"
+        style="display: none"
+      >
         {{ item(checked='checked')|safe }}
       </label>
+      <!-- prettier-ignore -->
       {% endfor %}
       {% endif %}
 
@@ -128,16 +173,18 @@
 
     {% else %}
     <p class="alert alert-warning">
-      {% trans %}This product is currently{% endtrans %} <strong>{% trans %}unavailable{% endtrans %}</strong>.
+      {% trans %}This product is currently{% endtrans %}
+      <strong>{% trans %}unavailable{% endtrans %}</strong>.
     </p>
     {% endif %}
     <div class="product__info__description">
       <h3>{% trans %}Description{% endtrans %}</h3>
-      <hr>
+      <hr />
       {{ product.description|safe }}
     </div>
-    <hr>
+    <hr />
     <table>
+      <!-- prettier-ignore -->
       {% for attribute, value in product.attribute_map.items() %}
       <tr>
         <td>{{ attribute }}:</td>
@@ -148,4 +195,3 @@
   </div>
 </div>
 {% endblock content %}
-

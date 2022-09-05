@@ -35,7 +35,7 @@ class TestUser:
         assert bool(user.username)
         assert bool(user.email)
         assert bool(user.created_at)
-        assert user.active is True
+        assert user.is_active is True
         assert user.check_password("myprecious")
 
     def test_check_password(self):
