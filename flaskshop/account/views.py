@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """User views."""
+import os
 from flask import (
     Blueprint,
     render_template,
@@ -20,8 +21,64 @@ from .forms import AddressForm, LoginForm, RegisterForm, ChangePasswordForm, Res
 from .models import UserAddress, User
 from flaskshop.utils import flash_errors
 from flaskshop.order.models import Order
+from flaskshop.logger import log
 
 impl = HookimplMarker("flaskshop")
+
+
+# @app.route("/google/")
+def google():
+    GOOGLE_CLIENT_ID = current_app.config["GOOGLE_CLIENT_ID"]
+    GOOGLE_CLIENT_SECRET = current_app.config["GOOGLE_CLIENT_SECRET"]
+    CONF_URL = "https://accounts.google.com/.well-known/openid-configuration"
+    current_app.oauth.register(
+        name="google",
+        client_id=GOOGLE_CLIENT_ID,
+        client_secret=GOOGLE_CLIENT_SECRET,
+        server_metadata_url=CONF_URL,
+        client_kwargs={"scope": "openid email profile"},
+    )
+
+    # Redirect to google_auth function
+    redirect_uri = url_for("google.google_auth", _external=True)
+    return current_app.oauth.google.authorize_redirect(redirect_uri)
+
+
+# @app.route("/google/auth/")
+def google_auth():
+    token = current_app.oauth.google.authorize_access_token()
+    user = current_app.oauth.google.parse_id_token(token)
+    log(log.INFO, f"user: {user}")
+    return redirect("/")
+
+
+def facebook():
+    # Facebook Oauth Config
+    FACEBOOK_CLIENT_ID = os.environ.get("FACEBOOK_CLIENT_ID")
+    FACEBOOK_CLIENT_SECRET = os.environ.get("FACEBOOK_CLIENT_SECRET")
+    current_app.oauth.register(
+        name="facebook",
+        client_id=FACEBOOK_CLIENT_ID,
+        client_secret=FACEBOOK_CLIENT_SECRET,
+        access_token_url="https://graph.facebook.com/oauth/access_token",
+        access_token_params=None,
+        authorize_url="https://www.facebook.com/dialog/oauth",
+        authorize_params=None,
+        api_base_url="https://graph.facebook.com/",
+        client_kwargs={"scope": "email"},
+    )
+    redirect_uri = url_for("facebook.facebook_auth", _external=True)
+    return current_app.oauth.facebook.authorize_redirect(redirect_uri)
+
+
+def facebook_auth():
+    token = current_user.oauth.facebook.authorize_access_token()
+    resp = current_user.oauth.facebook.get(
+        "https://graph.facebook.com/me?fields=id,name,email,picture{url}"
+    )
+    profile = resp.json()
+    log(log.INFO, f"Profile:{profile}")
+    return redirect("/")
 
 
 def index():
@@ -157,6 +214,15 @@ def delete_address(id):
 @impl
 def flaskshop_load_blueprints(app):
     bp = Blueprint("account", __name__)
+    google_bp = Blueprint("google", __name__)
+    facebook_bp = Blueprint("facebook", __name__)
+
+    google_bp.add_url_rule("/", view_func=google, methods=["GET", "POST"])
+    google_bp.add_url_rule("/auth", view_func=google_auth, methods=["GET", "POST"])
+
+    facebook_bp.add_url_rule("/", view_func=facebook, methods=["GET", "POST"])
+    facebook_bp.add_url_rule("/auth/", view_func=facebook_auth, methods=["GET", "POST"])
+
     bp.add_url_rule("/", view_func=index)
     bp.add_url_rule("/login", view_func=login, methods=["GET", "POST"])
     bp.add_url_rule("/resetpwd", view_func=resetpwd, methods=["GET", "POST"])
@@ -168,4 +234,7 @@ def flaskshop_load_blueprints(app):
     bp.add_url_rule(
         "/address/<int:id>/delete", view_func=delete_address, methods=["POST"]
     )
+
     app.register_blueprint(bp, url_prefix="/account")
+    app.register_blueprint(google_bp, url_prefix="/google")
+    app.register_blueprint(facebook_bp, url_prefix="/facebook")
