@@ -16,7 +16,6 @@ from pluggy import HookimplMarker
 from flask_babel import lazy_gettext
 import random
 import string
-
 from .forms import AddressForm, LoginForm, RegisterForm, ChangePasswordForm, ResetPasswd
 from .models import UserAddress, User
 from flaskshop.utils import flash_errors
@@ -142,28 +141,64 @@ def signup():
     """Register new user."""
     form = RegisterForm(request.form)
     if form.validate_on_submit():
-        user = User.create(
+        user = User(
             username=form.username.data,
             email=form.email.data.lower(),
-            password=form.password.data,
-            is_active=True,
         )
-        login_user(user)
-        flash(lazy_gettext("You are signed up."), "success")
+        user.save()
+        # send mail to the user
+        msg = Message(
+            subject="New password",
+            sender=current_app.config["MAIL_DEFAULT_SENDER"],
+            recipients=[user.email],
+        )
+        msg.html = render_template(
+            "account/partials/email_confirmation.html",
+            user=user,
+            url=url_for(
+                "account.set_password",
+                reset_password_uid=user.reset_password_uid,
+                _external=True,
+            ),
+            config=current_app.config,
+        )
+        current_app.mail.send(msg)
+        flash(
+            lazy_gettext(f"Confirmation email was sent to {form.email.data.lower()}"),
+            "success",
+        )
         return redirect(url_for("public.home"))
     else:
         flash_errors(form)
     return render_template("account/signup.html", form=form)
 
 
-def set_password():
+def set_password(reset_password_uid: str):
+    user: User = User.query.filter(
+        User.reset_password_uid == reset_password_uid
+    ).first()
+
+    if not user:
+        log(log.ERROR, "wrong reset_password_uid. [%s]", reset_password_uid)
+        flash("Incorrect reset password link", "danger")
+        return redirect(url_for("account.index"))
+
     form = ChangePasswordForm(request.form)
+
     if form.validate_on_submit():
-        current_user.update(password=form.password.data)
-        flash(lazy_gettext("You have changed password."), "success")
-    else:
-        flash_errors(form)
-    return redirect(url_for("account.index"))
+        user.password = form.password.data
+        user.reset_password_uid = ""
+        user.is_active = True
+        user.save()
+        login_user(user)
+        flash("Login successful.", "success")
+        return redirect(url_for("account.index"))
+    elif form.is_submitted():
+        log(log.WARNING, "form error: [%s]", form.errors)
+        flash("Wrong user password.", "danger")
+    return render_template(
+        "account/password_reset.html", form=form, reset_password_uid=reset_password_uid
+    )
 
 
 def addresses():
@@ -227,7 +262,9 @@ def flaskshop_load_blueprints(app):
     bp.add_url_rule("/resetpwd", view_func=resetpwd, methods=["GET", "POST"])
     bp.add_url_rule("/logout", view_func=logout)
     bp.add_url_rule("/signup", view_func=signup, methods=["GET", "POST"])
-    bp.add_url_rule("/setpwd", view_func=set_password, methods=["POST"])
+    bp.add_url_rule(
+        "/setpwd/<reset_password_uid>", view_func=set_password, methods=["GET", "POST"]
+    )
     bp.add_url_rule("/address", view_func=addresses)
     bp.add_url_rule("/address/edit", view_func=edit_address, methods=["GET", "POST"])
     bp.add_url_rule(

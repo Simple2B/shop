@@ -65,10 +65,7 @@
               {{ order.status_human }}
             </div>
             <div class="col-md-1 col-5">
-              <a
-                href="{{ order.get_absolute_url() }}"
-                class="float-right link--styled"
-              >
+              <a href="{{ order.get_absolute_url() }}" class="float-right link--styled">
                 {% trans %}Details{% endtrans %}
               </a>
             </div>
@@ -88,18 +85,13 @@
     <div class="tab-pane fade" id="password" role="tabpanel">
       <div class="row">
         <div class="col-md-8 col-lg-6 m-auto account__password">
-          <form action="{{ url_for('account.set_password') }}" method="post">
+          <form action="{{ url_for('account.resetpwd') }}" method="post">
             <!-- prettier-ignore -->
             {{ form.csrf_token }}
-            {{ render_field(form.old_password) }}
             {{ render_field(form.password) }}
-            {{ render_field(form.confirm) }}
+            {{ render_field(form.password_confirmation) }}
 
-            <input
-              type="submit"
-              class="btn btn-primary narrow"
-              value="{% trans %}Change password{% endtrans %}"
-            />
+            <input type="submit" class="btn btn-primary narrow" value="{% trans %}Change password{% endtrans %}" />
           </form>
         </div>
       </div>
@@ -120,20 +112,12 @@
                 </li>
                 <li>
                   <a class="delete-icon">
-                    <svg
-                      data-src="{{ url_for('static', filename='img/delete.svg') }}"
-                      height="20px"
-                      width="20px"
-                    ></svg>
+                    <svg data-src="{{ url_for('static', filename='img/delete.svg') }}" height="20px" width="20px"></svg>
                   </a>
                 </li>
               </ul>
               <div class="address-delete none">
-                <form
-                  method="post"
-                  novalidate
-                  action="{{url_for('account.delete_address', id=address.id)}}"
-                >
+                <form method="post" novalidate action="{{url_for('account.delete_address', id=address.id)}}">
                   {{form.csrf_token}}
                   <button type="submit" class="btn danger narrow float-right">
                     {% trans %}Remove Address{% endtrans %}
@@ -148,11 +132,7 @@
           {% endfor %}
         </div>
         <p class="text-right">
-          <a
-            class="btn btn-primary narrow"
-            style="color: #fff"
-            href="{{url_for('account.edit_address')}}"
-          >
+          <a class="btn btn-primary narrow" style="color: #fff" href="{{url_for('account.edit_address')}}">
             {% trans %}New Address{% endtrans %}
           </a>
         </p>

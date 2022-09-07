@@ -2,10 +2,9 @@
 """User forms."""
 from flask_wtf import FlaskForm
 from flask_login import current_user
-from wtforms import PasswordField, StringField
+from wtforms import PasswordField, StringField, SubmitField, ValidationError
 from wtforms.validators import DataRequired, Email, EqualTo, Length, Regexp
 from flask_babel import lazy_gettext
-
 
 from .models import User
 
@@ -13,57 +12,16 @@ from .models import User
 class RegisterForm(FlaskForm):
     """Register form."""
 
-    username = StringField(
-        lazy_gettext("Username"),
-        validators=[
-            DataRequired(),
-            Length(min=3, max=25),
-            Regexp(
-                "^[a-zA-Z0-9]*$",
-                message=lazy_gettext(
-                    "The username should contain only a-z, A-Z and 0-9."
-                ),
-            ),
-        ],
-    )
-    email = StringField(
-        lazy_gettext("Email"),
-        validators=[DataRequired(), Email(), Length(min=6, max=40)],
-    )
-    password = PasswordField(
-        lazy_gettext("Password"), validators=[DataRequired(), Length(min=6, max=40)]
-    )
-    confirm = PasswordField(
-        lazy_gettext("Verify password"),
-        [
-            DataRequired(),
-            EqualTo("password", message=lazy_gettext("Passwords must match")),
-        ],
-    )
+    username = StringField("Username", validators=[DataRequired(), Length(2, 30)])
+    email = StringField("Email Address", validators=[DataRequired(), Email()])
 
-    def __init__(self, *args, **kwargs):
-        """Create instance."""
-        super().__init__(*args, **kwargs)
-        self.user = None
+    def validate_username(form, field):
+        if User.query.filter_by(username=field.data).first() is not None:
+            raise ValidationError("This username is taken.")
 
-    def validate(self):
-        """Validate the form."""
-        initial_validation = super().validate()
-        if not initial_validation:
-            return False
-        user = User.query.filter_by(username=self.username.data).first()
-        if user:
-            self.username.errors.append(
-                lazy_gettext("Username already registered"),
-            )
-            return False
-        user = User.query.filter_by(email=self.email.data).first()
-        if user:
-            self.email.errors.append(
-                lazy_gettext("Email already registered"),
-            )
-            return False
-        return True
+    def validate_email(form, field):
+        if User.query.filter_by(email=field.data).first() is not None:
+            raise ValidationError("This email is already registered.")
 
 
 class ResetPasswd(FlaskForm):
@@ -139,34 +97,32 @@ class LoginForm(FlaskForm):
 
 
 class ChangePasswordForm(FlaskForm):
-    old_password = PasswordField(
-        lazy_gettext("Old Password"), validators=[DataRequired()]
-    )
-    password = PasswordField(lazy_gettext("Password"), validators=[DataRequired()])
-    confirm = PasswordField(
-        lazy_gettext("Verify password"),
+    password = PasswordField("Password", validators=[DataRequired(), Length(6, 30)])
+    password_confirmation = PasswordField(
+        "Confirm Password",
         validators=[
             DataRequired(),
-            EqualTo("password", message=lazy_gettext("Passwords must match")),
+            EqualTo("password", message="Password do not match."),
         ],
     )
+    submit = SubmitField("Save")
 
-    def __init__(self, *args, **kwargs):
-        """Create instance."""
-        super().__init__(*args, **kwargs)
-        self.user = current_user
+    # def __init__(self, *args, **kwargs):
+    #     """Create instance."""
+    #     super().__init__(*args, **kwargs)
+    #     self.user = current_user
 
-    def validate(self):
-        """Validate the form."""
-        initial_validation = super().validate()
-        if not initial_validation:
-            return False
+    # def validate(self):
+    #     """Validate the form."""
+    #     initial_validation = super().validate()
+    #     if not initial_validation:
+    #         return False
 
-        if not self.user.check_password(self.old_password.data):
-            self.old_password.errors.append(lazy_gettext("Invalid password"))
-            return False
+    #     if not self.user.check_password(self.old_password.data):
+    #         self.old_password.errors.append(lazy_gettext("Invalid password"))
+    #         return False
 
-        return True
+    #     return True
 
 
 class AddressForm(FlaskForm):
