@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Product views."""
-from flask import Blueprint, render_template, request, jsonify
-from flask_login import login_required
+from flask import Blueprint, render_template, request, jsonify, redirect, url_for
+from flask_login import login_required, current_user
 from pluggy import HookimplMarker
 
 from flaskshop.checkout.models import Cart

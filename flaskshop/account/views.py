@@ -105,7 +105,6 @@ def id_generator(size=8, chars=string.ascii_uppercase + string.digits):
 
 
 def resetpwd():
-
     """Reset user password"""
     form = ResetPasswd(request.form)
 
