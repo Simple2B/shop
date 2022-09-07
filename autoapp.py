@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
 """Create an application instance."""
 from flaskshop.app import create_app
+from flaskshop.settings import config
+from os import environ as env
 
-app = create_app()
+environment = env.get("FLASK_ENV", "dev")
+print(environment)
+conf = config[environment]
+print(conf.SQLALCHEMY_DATABASE_URI)
+app = create_app(conf)

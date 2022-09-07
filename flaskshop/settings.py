@@ -7,25 +7,25 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-class LocalConfig:
-    db_type = os.getenv("DB_TYPE", "mysql")
-    user = os.getenv("DB_USER", "postgres")
-    passwd = os.getenv("DB_PASSWD", "secret")
-    host = os.getenv("DB_HOST", "127.0.0.1")
-    port = os.getenv("LOCAL_DB_PORT", 3306)
-    db_name = os.getenv("DB_NAME", "db")
-    if db_type == "postgresql":
-        db_uri = "postgresql://{user}:{passwd}@{host}:5432/{db_name}".format(
-            user=user, passwd=passwd, host=host, db_name=db_name
-        )
-    elif db_type == "mysql":
-        db_uri = "mysql+pymysql://{user}:{passwd}@{host}:{port}/{db_name}?charset=utf8mb4".format(
-            user=user, passwd=passwd, host=host, port=port, db_name=db_name
-        )
-    # redis_uri = "redis://127.0.0.1:6379"
-    # esearch_uri = "localhost:9200"
-    redis_uri = "redis://redis:6379"
-    esearch_uri = "http://localhost:9200"
+# class LocalConfig:
+#     db_type = os.getenv("DB_TYPE", "mysql")
+#     user = os.getenv("DB_USER", "postgres")
+#     passwd = os.getenv("DB_PASSWD", "secret")
+#     # host = os.getenv("DB_HOST", "127.0.0.1")
+#     port = os.getenv("LOCAL_DB_PORT", 3306)
+#     db_name = os.getenv("DB_NAME", "db")
+#     if db_type == "postgresql":
+#         db_uri = "postgresql://{user}:{passwd}@{host}:5432/{db_name}".format(
+#             user=user, passwd=passwd, host=host, db_name=db_name
+#         )
+#     elif db_type == "mysql":
+#         db_uri = "mysql+pymysql://{user}:{passwd}@{host}:{port}/{db_name}?charset=utf8mb4".format(
+#             user=user, passwd=passwd, host=host, port=port, db_name=db_name
+#         )
+#     # redis_uri = "redis://127.0.0.1:6379"
+#     # esearch_uri = "localhost:9200"
+#     redis_uri = "redis://redis:6379"
+#     esearch_uri = "http://localhost:9200"
 
 
 class Config:
@@ -38,7 +38,9 @@ class Config:
     #   - save product description
     #   - save page content
     USE_REDIS = int(os.getenv("USE_REDIS", 0)) == 1
-    REDIS_URL = os.getenv("REDIS_URI", LocalConfig.redis_uri)
+    REDIS_URL = os.getenv(
+        "REDIS_URI",
+    )
 
     GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
     GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
@@ -49,9 +51,8 @@ class Config:
     # if elasticsearch is enabled, the home page will have a search bar
     # and while add a product, the search index will get update
     USE_ES = int(os.getenv("USE_ES", 0)) == 1
-    ES_HOSTS = [os.getenv("ESEARCH_URI", LocalConfig.esearch_uri)]
+    ES_HOSTS = [os.getenv("ESEARCH_URI")]
     # SQLALCHEMY
-    SQLALCHEMY_DATABASE_URI = os.getenv("DB_URI", LocalConfig.db_uri)
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     DATABASE_QUERY_TIMEOUT = 0.1  # log the slow database query, and unit is second
     SQLALCHEMY_RECORD_QUERIES = True
@@ -65,9 +66,7 @@ class Config:
     UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER", "static/placeholders")
     PURCHASE_URI = os.getenv("PURCHASE_URI", "")
     BCRYPT_LOG_ROUNDS = 13
-    DEBUG_TB_ENABLED = int(os.getenv("FLASK_DEBUG", 0)) == 1
-    DEBUG_TB_INTERCEPT_REDIRECTS = False
-    DEBUG_TB_PROFILER_ENABLED = True
+
     MESSAGE_QUOTA = 10
     LANGUAGES = {"en": "English", "bg": "Български"}
     BABEL_DEFAULT_LOCALE = os.getenv("BABEL_DEFAULT_LOCALE", "en_US")
@@ -85,26 +84,50 @@ class Config:
     else:
         MAIL_USE_TLS = False
         MAIL_USE_SSL = True
-    MAIL_DEBUG = DEBUG_TB_ENABLED
+
     MAIL_USERNAME = os.getenv("MAIL_USERNAME", "")
     MAIL_PASSWORD = os.getenv("MAIL_PASSWORD", "")
     MAIL_DEFAULT_SENDER = os.getenv("MAIL_DEFAULT_SENDER", "")
     GA_MEASUREMENT_ID = os.getenv("GA_MEASUREMENT_ID", "")
+
+    GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+    GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_ID")
+    GOOGLE_ACCESS_TOKEN_URL = "https://accounts.google.com/o/oauth2/token"
+
+    FACEBOOK_CLIENT_ID = os.getenv("FACEBOOK_CLIENT_ID")
+    FACEBOOK_CLIENT_SECRET = os.getenv("FACEBOOK_CLIENT_SECRET")
+    FACEBOOK_ACCESS_TOKEN_URL = "https://graph.facebook.com/oauth/access_token"
 
 
 class TestConfig(Config):
     SQLALCHEMY_DATABASE_URI = "sqlite:///" + str(
         (Path(__file__).parent.parent / "database-test.sqlite3")
     )
+    DEBUG = True
     WTF_CSRF_ENABLED = False
+    DEBUG_TB_ENABLED = int(os.getenv("FLASK_DEBUG", 0)) == 1
+    DEBUG_TB_INTERCEPT_REDIRECTS = False
+    DEBUG_TB_PROFILER_ENABLED = True
+    MAIL_DEBUG = DEBUG_TB_ENABLED
 
 
 class DevConfig(Config):
     ENV = "dev"
     DEBUG = True
+    DEBUG_TB_ENABLED = int(os.getenv("FLASK_DEBUG", 0)) == 1
+    DEBUG_TB_INTERCEPT_REDIRECTS = False
+    DEBUG_TB_PROFILER_ENABLED = True
+    MAIL_DEBUG = DEBUG_TB_ENABLED
 
 
 class ProdConfig(Config):
-    ENV = "prod"
+    ENV = "production"
     DEBUG = False
     DEBUG_TB_ENABLED = False
+    SQLALCHEMY_DATABASE_URI = os.getenv(
+        "DB_URI",
+        "sqlite:///" + str((Path(__file__).parent.parent / "database-test.sqlite3")),
+    )
+
+
+config = {config_class.ENV: config_class for config_class in (DevConfig, ProdConfig)}

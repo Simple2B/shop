@@ -34,3 +34,5 @@
 # Search
 
 # Translation
+
+# Set up migrations

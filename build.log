@@ -1,0 +1,223 @@
+#1 [internal] load build definition from Dockerfile
+#1 sha256:0248cb442164f499ac6943b54839586b888d3a9849a3a9c74bd521663c2a9125
+#1 transferring dockerfile: 829B done
+#1 DONE 0.0s
+
+#2 [internal] load .dockerignore
+#2 sha256:af21ffcad8e700b934e7348d7e2a39ef47bd402a832c7cb6cc7da7f1d6e33c24
+#2 transferring context: 2B done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/python:3.9
+#3 sha256:5ceb849adf4ca2eed629b09d8add870d381c45f6f40f947be68f6595c97a8af8
+#3 DONE 0.0s
+
+#4 [ 1/10] FROM docker.io/library/python:3.9
+#4 sha256:3464e991adc12806f3b3cffe9c3cb1519d1d1016109972ce939d50250af91d7c
+#4 DONE 0.0s
+
+#5 [ 2/10] WORKDIR /app
+#5 sha256:67d352acab6dc79d819c5c671d028e7ba7bc797b9419f80a8e4d1353be6e0249
+#5 CACHED
+
+#9 [internal] load build context
+#9 sha256:9d36674456ae5489345c206b83ed1cc50bf9f6073763fa77abdcfbaefa30b778
+#9 transferring context: 1.66MB 0.4s done
+#9 DONE 0.4s
+
+#6 [ 3/10] RUN apt-get update --yes --quiet && apt-get install --yes --quiet --no-install-recommends     build-essential     libpq-dev     libmariadb-dev     libjpeg62-turbo-dev     zlib1g-dev     libwebp-dev
+#6 sha256:315452cf316df9a97ca70fe9d3f98ac3be44882d525c0585e0daaeb8093afc42
+#6 0.540 Get:1 http://deb.debian.org/debian bullseye InRelease [116 kB]
+#6 0.645 Get:2 http://deb.debian.org/debian-security bullseye-security InRelease [48.4 kB]
+#6 0.693 Get:3 http://deb.debian.org/debian bullseye-updates InRelease [44.1 kB]
+#6 0.743 Get:4 http://deb.debian.org/debian bullseye/main amd64 Packages [8182 kB]
+#6 1.570 Get:5 http://deb.debian.org/debian-security bullseye-security/main amd64 Packages [182 kB]
+#6 1.581 Get:6 http://deb.debian.org/debian bullseye-updates/main amd64 Packages [2596 B]
+#6 2.346 Fetched 8574 kB in 2s (4429 kB/s)
+#6 2.346 Reading package lists...
+#6 2.797 Reading package lists...
+#6 3.215 Building dependency tree...
+#6 3.327 Reading state information...
+#6 3.422 libjpeg62-turbo-dev is already the newest version (1:2.0.6-4).
+#6 3.422 libjpeg62-turbo-dev set to manually installed.
+#6 3.422 libwebp-dev is already the newest version (0.6.1-2.1).
+#6 3.422 libmariadb-dev is already the newest version (1:10.5.15-0+deb11u1).
+#6 3.422 libmariadb-dev set to manually installed.
+#6 3.422 libpq-dev is already the newest version (13.7-0+deb11u1).
+#6 3.422 The following additional packages will be installed:
+#6 3.422   zlib1g
+#6 3.438 The following NEW packages will be installed:
+#6 3.439   build-essential
+#6 3.440 The following packages will be upgraded:
+#6 3.440   zlib1g zlib1g-dev
+#6 3.538 2 upgraded, 1 newly installed, 0 to remove and 2 not upgraded.
+#6 3.538 Need to get 290 kB of archives.
+#6 3.538 After this operation, 22.5 kB of additional disk space will be used.
+#6 3.538 Get:1 http://deb.debian.org/debian-security bullseye-security/main amd64 zlib1g-dev amd64 1:1.2.11.dfsg-2+deb11u2 [191 kB]
+#6 3.679 Get:2 http://deb.debian.org/debian-security bullseye-security/main amd64 zlib1g amd64 1:1.2.11.dfsg-2+deb11u2 [91.4 kB]
+#6 3.687 Get:3 http://deb.debian.org/debian bullseye/main amd64 build-essential amd64 12.9 [7704 B]
+#6 3.825 debconf: delaying package configuration, since apt-utils is not installed
+#6 3.856 Fetched 290 kB in 0s (1184 kB/s)
+#6 3.878 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 23421 files and directories currently installed.)
+#6 3.900 Preparing to unpack .../zlib1g-dev_1%3a1.2.11.dfsg-2+deb11u2_amd64.deb ...
+#6 3.910 Unpacking zlib1g-dev:amd64 (1:1.2.11.dfsg-2+deb11u2) over (1:1.2.11.dfsg-2+deb11u1) ...
+#6 3.991 Preparing to unpack .../zlib1g_1%3a1.2.11.dfsg-2+deb11u2_amd64.deb ...
+#6 4.002 Unpacking zlib1g:amd64 (1:1.2.11.dfsg-2+deb11u2) over (1:1.2.11.dfsg-2+deb11u1) ...
+#6 4.049 Setting up zlib1g:amd64 (1:1.2.11.dfsg-2+deb11u2) ...
+#6 4.077 Selecting previously unselected package build-essential.
+#6 4.077 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 23421 files and directories currently installed.)
+#6 4.087 Preparing to unpack .../build-essential_12.9_amd64.deb ...
+#6 4.090 Unpacking build-essential (12.9) ...
+#6 4.119 Setting up zlib1g-dev:amd64 (1:1.2.11.dfsg-2+deb11u2) ...
+#6 4.127 Setting up build-essential (12.9) ...
+#6 4.137 Processing triggers for libc-bin (2.31-13+deb11u3) ...
+#6 DONE 4.2s
+
+#7 [ 4/10] RUN curl -sSL https://install.python-poetry.org | POETRY_HOME=/etc/poetry python3 -
+#7 sha256:a489711e4c6ad00e35ac84fe030692c7a20eb429d7c26eb292e41f0478ea24c1
+#7 1.025 Retrieving Poetry metadata
+#7 1.271 
+#7 1.273 # Welcome to Poetry!
+#7 1.273 
+#7 1.273 This will download and install the latest version of Poetry,
+#7 1.273 a dependency and package manager for Python.
+#7 1.273 
+#7 1.273 It will add the `poetry` command to Poetry's bin directory, located at:
+#7 1.273 
+#7 1.273 /etc/poetry/bin
+#7 1.273 
+#7 1.273 You can uninstall at any time by executing this script with the --uninstall option,
+#7 1.273 and these changes will be reverted.
+#7 1.273 
+#7 1.273 Installing Poetry (1.2.0)
+#7 1.273 Installing Poetry (1.2.0): Creating environment
+#7 7.117 Installing Poetry (1.2.0): Installing Poetry
+#7 18.97 Installing Poetry (1.2.0): Creating script
+#7 18.97 Installing Poetry (1.2.0): Done
+#7 18.97 
+#7 18.97 Poetry (1.2.0) is installed now. Great!
+#7 18.97 
+#7 18.97 To get started you need Poetry's bin directory (/etc/poetry/bin) in your `PATH`
+#7 18.97 environment variable.
+#7 18.97 
+#7 18.97 Add `export PATH="/etc/poetry/bin:$PATH"` to your shell configuration file.
+#7 18.97 
+#7 18.97 Alternatively, you can call Poetry explicitly with `/etc/poetry/bin/poetry`.
+#7 18.97 
+#7 18.97 You can test that everything is set up by executing:
+#7 18.97 
+#7 18.97 `poetry --version`
+#7 18.97 
+#7 DONE 19.0s
+
+#8 [ 5/10] RUN ls -l /etc/poetry
+#8 sha256:6c733ae033c5a0c8b8f3e2f92f037881293846b89882874639c2b31add06b4ed
+#8 0.565 total 12
+#8 0.565 -rw-r--r-- 1 root root    5 Sep  7 15:12 VERSION
+#8 0.565 drwxr-xr-x 2 root root 4096 Sep  7 15:12 bin
+#8 0.565 drwxr-xr-x 5 root root 4096 Sep  7 15:12 venv
+#8 DONE 0.6s
+
+#10 [ 6/10] COPY poetry.lock .
+#10 sha256:6c83b2c2421c612c05c6ca67f6108f5c59a301a5d8196de3211acd688ac80907
+#10 DONE 0.0s
+
+#11 [ 7/10] COPY pyproject.toml .
+#11 sha256:8514c413a4fff7d9d2021ce016fd9056567c18395261437ea614ea9f043826d4
+#11 DONE 0.0s
+
+#12 [ 8/10] RUN echo /usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/etc/poetry/bin
+#12 sha256:addd5624e9bd738591d8c0bdb9e462e5cf6f4668c99e1a2323aa11dc0c6ce00e
+#12 0.605 /usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/etc/poetry/bin
+#12 DONE 0.6s
+
+#13 [ 9/10] RUN POETRY_VIRTUALENVS_CREATE=false poetry install --no-dev --no-interaction --no-ansi
+#13 sha256:ef1797176cd123284ba1f7a0b9dcf7ef6486a9319fb4530de78f2cb4f1131143
+#13 0.919 Skipping virtualenv creation, as specified in config file.
+#13 1.022 The `--no-dev` option is deprecated, use the `--only main` notation instead.
+#13 2.400 Installing dependencies from lock file
+#13 4.564 
+#13 4.564 Package operations: 70 installs, 0 updates, 0 removals
+#13 4.564 
+#13 4.565   • Installing markupsafe (2.1.1)
+#13 4.565   • Installing pycparser (2.21)
+#13 4.566   • Installing zipp (3.8.1)
+#13 6.930   • Installing cffi (1.15.1)
+#13 6.930   • Installing click (8.1.3)
+#13 6.931   • Installing greenlet (1.1.3)
+#13 6.932   • Installing importlib-metadata (4.12.0)
+#13 6.933   • Installing itsdangerous (2.1.2)
+#13 6.933   • Installing jinja2 (3.1.2)
+#13 6.940   • Installing six (1.16.0)
+#13 6.947   • Installing werkzeug (2.2.2)
+#13 9.551   • Installing attrs (22.1.0)
+#13 9.551   • Installing certifi (2022.6.15)
+#13 9.551   • Installing cryptography (37.0.4)
+#13 9.551   • Installing flask (2.1.0)
+#13 9.551   • Installing mako (1.2.2)
+#13 9.553   • Installing pyparsing (3.0.9)
+#13 9.553   • Installing pyrsistent (0.18.1)
+#13 9.572   • Installing python-dateutil (2.8.2)
+#13 9.573   • Installing pytz (2022.2.1)
+#13 9.576   • Installing soupsieve (2.3.2.post1)
+#13 9.579   • Installing sqlalchemy (1.4.40)
+#13 9.581   • Installing urllib3 (1.26.12)
+#13 9.582   • Installing wrapt (1.14.1)
+#13 14.08   • Installing alembic (1.8.1)
+#13 14.08   • Installing aniso8601 (9.0.1)
+#13 14.08   • Installing async-timeout (4.0.2)
+#13 14.08   • Installing babel (2.10.3)
+#13 14.08   • Installing bcrypt (4.0.0)
+#13 14.08   • Installing beautifulsoup4 (4.11.1)
+#13 14.08   • Installing blinker (1.5)
+#13 14.08   • Installing charset-normalizer (2.1.1)
+#13 14.08   • Installing deprecated (1.2.13)
+#13 14.08   • Installing dnspython (2.2.1)
+#13 14.09   • Installing elasticsearch (7.17.6)
+#13 14.09   • Installing faker (14.2.0)
+#13 14.09   • Installing flask-sqlalchemy (2.5.1)
+#13 14.09   • Installing idna (3.3)
+#13 14.09   • Installing jsonschema (4.15.0)
+#13 14.10   • Installing packaging (21.3)
+#13 14.10   • Installing pycryptodomex (3.9.4)
+#13 14.10   • Installing pyopenssl (19.1.0)
+#13 14.10   • Installing waitress (2.1.2)
+#13 14.10   • Installing webob (1.8.7)
+#13 19.24   • Installing wtforms (3.0.1)
+#13 35.74   • Installing arrow (1.2.3)
+#13 35.74   • Installing authlib (1.0.1)
+#13 35.74   • Installing bootstrap-flask (2.1.0)
+#13 35.75   • Installing elasticsearch-dsl (7.4.0)
+#13 35.75   • Installing email-validator (1.2.1)
+#13 35.75   • Installing factory-boy (3.2.1)
+#13 35.75   • Installing flask-babel (2.0.0)
+#13 35.75   • Installing flask-bcrypt (1.0.1)
+#13 35.75   • Installing flask-ckeditor (0.4.6)
+#13 35.75   • Installing flask-debugtoolbar (0.13.1)
+#13 35.76   • Installing flask-login (0.6.2)
+#13 35.76   • Installing flask-mail (0.9.1)
+#13 35.76   • Installing flask-migrate (3.1.0)
+#13 35.76   • Installing flask-restplus (0.13.0)
+#13 35.76   • Installing flask-wtf (1.0.1)
+#13 35.76   • Installing libgravatar (1.0.0)
+#13 35.76   • Installing markup (0.2)
+#13 35.76   • Installing phonenumbers (8.12.54)
+#13 35.76   • Installing pluggy (1.0.0)
+#13 35.77   • Installing psycopg2-binary (2.9.3)
+#13 39.64   • Installing python-alipay-sdk (3.0.4)
+#13 39.83   • Installing python-dotenv (0.20.0)
+#13 39.98   • Installing redis (4.3.4)
+#13 40.11   • Installing requests (2.28.1)
+#13 40.15   • Installing webtest (3.0.0)
+#13 DONE 47.6s
+
+#14 [10/10] COPY . .
+#14 sha256:fb0779799b9dbf4f08c756c965d7fc7b8de3e1ba1a5f620ddfd93147788d58b5
+#14 DONE 2.4s
+
+#15 exporting to image
+#15 sha256:e8c613e07b0b7ff33893b694f7759a10d42e180f2b4dc349fb57dc6b71dcab00
+#15 exporting layers
+#15 exporting layers 1.9s done
+#15 writing image sha256:f75063ec453ecbef8044ffeb42a4249bc3ab6bf78b979ddd4fa3982f74e1ea2a done
+#15 DONE 1.9s

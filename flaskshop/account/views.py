@@ -28,16 +28,19 @@ impl = HookimplMarker("flaskshop")
 
 # @app.route("/google/")
 def google():
-    GOOGLE_CLIENT_ID = current_app.config["GOOGLE_CLIENT_ID"]
-    GOOGLE_CLIENT_SECRET = current_app.config["GOOGLE_CLIENT_SECRET"]
-    CONF_URL = "https://accounts.google.com/.well-known/openid-configuration"
-    current_app.oauth.register(
-        name="google",
-        client_id=GOOGLE_CLIENT_ID,
-        client_secret=GOOGLE_CLIENT_SECRET,
-        server_metadata_url=CONF_URL,
-        client_kwargs={"scope": "openid email profile"},
-    )
+    # current_app.oauth.register(
+    #     name="google",
+    #     client_id=,
+    #     client_secret=GOOGLE_CLIENT_SECRET,
+
+    #     access_token_url="https://accounts.google.com/o/oauth2/token",
+    #     access_token_params=None,
+    #     authorize_url="https://accounts.google.com/o/oauth2/auth",
+    #     authorize_params=None,
+    #     api_base_url="https://www.googleapis.com/oauth2/v1/",
+    #     userinfo_endpoint="https://openidconnect.googleapis.com/v1/userinfo",
+    #     client_kwargs={"scope": "openid email profile"},
+    # )
 
     # Redirect to google_auth function
     redirect_uri = url_for("google.google_auth", _external=True)
@@ -56,17 +59,17 @@ def facebook():
     # Facebook Oauth Config
     FACEBOOK_CLIENT_ID = os.environ.get("FACEBOOK_CLIENT_ID")
     FACEBOOK_CLIENT_SECRET = os.environ.get("FACEBOOK_CLIENT_SECRET")
-    current_app.oauth.register(
-        name="facebook",
-        client_id=FACEBOOK_CLIENT_ID,
-        client_secret=FACEBOOK_CLIENT_SECRET,
-        access_token_url="https://graph.facebook.com/oauth/access_token",
-        access_token_params=None,
-        authorize_url="https://www.facebook.com/dialog/oauth",
-        authorize_params=None,
-        api_base_url="https://graph.facebook.com/",
-        client_kwargs={"scope": "email"},
-    )
+    # current_app.oauth.register(
+    #     name="facebook",
+    #     client_id=FACEBOOK_CLIENT_ID,
+    #     client_secret=FACEBOOK_CLIENT_SECRET,
+    #     access_token_url="https://graph.facebook.com/oauth/access_token",
+    #     access_token_params=None,
+    #     authorize_url="https://www.facebook.com/dialog/oauth",
+    #     authorize_params=None,
+    #     api_base_url="https://graph.facebook.com/",
+    #     client_kwargs={"scope": "email"},
+    # )
     redirect_uri = url_for("facebook.facebook_auth", _external=True)
     return current_app.oauth.facebook.authorize_redirect(redirect_uri)
 
@@ -223,7 +226,7 @@ def flaskshop_load_blueprints(app):
     facebook_bp.add_url_rule("/", view_func=facebook, methods=["GET", "POST"])
     facebook_bp.add_url_rule("/auth/", view_func=facebook_auth, methods=["GET", "POST"])
 
-    bp.add_url_rule("/", view_func=index)
+    bp.add_url_rule("/", view_func=index, methods=["GET"])
     bp.add_url_rule("/login", view_func=login, methods=["GET", "POST"])
     bp.add_url_rule("/resetpwd", view_func=resetpwd, methods=["GET", "POST"])
     bp.add_url_rule("/logout", view_func=logout)
