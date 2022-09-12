@@ -1,28 +1,36 @@
 from operator import or_
 from functools import reduce
+import enum
 
 from flask_login import UserMixin
 from libgravatar import Gravatar
 from sqlalchemy.ext.hybrid import hybrid_property
-
+from sqlalchemy.types import Enum
 from flaskshop.database import Column, Model, db
 from flaskshop.extensions import bcrypt
 from flaskshop.constant import Permission
 
 
+class OpenidProviders(enum.Enum):
+    GOOGLE = 1
+    FACEBOOK = 2
+
+
 class User(Model, UserMixin):
+
     __tablename__ = "account_user"
     username = Column(db.String(80), unique=True, nullable=False, comment="user`s name")
     email = Column(db.String(80), unique=True, nullable=False)
     #: The hashed password
-    _password = db.Column(db.String, nullable=False)
+    _password = db.Column(db.String, nullable=True, default=None)
     nick_name = Column(db.String(255))
     is_active = Column(db.Boolean(), default=False)
     open_id = Column(db.String(80), index=True)
     session_key = Column(db.String(80), index=True)
+    provider = Column(Enum(OpenidProviders), nullable=False)
 
-    def __init__(self, username, email, password, **kwargs):
-        super().__init__(username=username, email=email, password=password, **kwargs)
+    # def __init__(self, username, email, password, **kwargs):
+    #     super().__init__(username=username, email=email, password=password, **kwargs)
 
     def __str__(self):
         return self.username

@@ -9,8 +9,10 @@ from flask import (
     redirect,
     url_for,
     current_app,
+    session,
 )
 from flask_login import login_required, current_user, login_user, logout_user
+from flaskshop.extensions import csrf_protect, login_manager
 from flask_mail import Message
 from pluggy import HookimplMarker
 from flask_babel import lazy_gettext
@@ -18,65 +20,52 @@ import random
 import string
 
 from .forms import AddressForm, LoginForm, RegisterForm, ChangePasswordForm, ResetPasswd
-from .models import UserAddress, User
+from .models import OpenidProviders, UserAddress, User
 from flaskshop.utils import flash_errors
 from flaskshop.order.models import Order
 from flaskshop.logger import log
+import requests
 
 impl = HookimplMarker("flaskshop")
 
-
-# @app.route("/google/")
-def google():
-    # current_app.oauth.register(
-    #     name="google",
-    #     client_id=,
-    #     client_secret=GOOGLE_CLIENT_SECRET,
-
-    #     access_token_url="https://accounts.google.com/o/oauth2/token",
-    #     access_token_params=None,
-    #     authorize_url="https://accounts.google.com/o/oauth2/auth",
-    #     authorize_params=None,
-    #     api_base_url="https://www.googleapis.com/oauth2/v1/",
-    #     userinfo_endpoint="https://openidconnect.googleapis.com/v1/userinfo",
-    #     client_kwargs={"scope": "openid email profile"},
-    # )
-
-    # Redirect to google_auth function
-    redirect_uri = url_for("google.google_auth", _external=True)
-    return current_app.oauth.google.authorize_redirect(redirect_uri)
-
-
-# @app.route("/google/auth/")
+# JS !!!!!
+# how to add https
+@csrf_protect.exempt
 def google_auth():
-    token = current_app.oauth.google.authorize_access_token()
-    user = current_app.oauth.google.parse_id_token(token)
-    log(log.INFO, f"user: {user}")
-    return redirect("/")
+    token = request.json["access_token"]
+    if token:
+        user_data = requests.get(
+            f"https://openidconnect.googleapis.com/v1/userinfo?access_token={token}"
+        )
+        # if user_data:
+        user_data = user_data.json()
+        user = User.query.filter_by(
+            open_id=user_data["sub"], email=user_data["email"]
+        ).first()
+        if not user:
+            user = User.create(
+                open_id=user_data["sub"],
+                email=user_data["email"],
+                is_active=True,
+                username=user_data["email"],
+                provider=OpenidProviders.GOOGLE,
+            )
+        login_user(user)
+    else:
+        flash(lazy_gettext("Error while logging in via Google"), "error")
+    return redirect(url_for("account.index"))
 
 
 def facebook():
     # Facebook Oauth Config
-    FACEBOOK_CLIENT_ID = os.environ.get("FACEBOOK_CLIENT_ID")
-    FACEBOOK_CLIENT_SECRET = os.environ.get("FACEBOOK_CLIENT_SECRET")
-    # current_app.oauth.register(
-    #     name="facebook",
-    #     client_id=FACEBOOK_CLIENT_ID,
-    #     client_secret=FACEBOOK_CLIENT_SECRET,
-    #     access_token_url="https://graph.facebook.com/oauth/access_token",
-    #     access_token_params=None,
-    #     authorize_url="https://www.facebook.com/dialog/oauth",
-    #     authorize_params=None,
-    #     api_base_url="https://graph.facebook.com/",
-    #     client_kwargs={"scope": "email"},
-    # )
     redirect_uri = url_for("facebook.facebook_auth", _external=True)
+    print(redirect_uri)
     return current_app.oauth.facebook.authorize_redirect(redirect_uri)
 
 
 def facebook_auth():
-    token = current_user.oauth.facebook.authorize_access_token()
-    resp = current_user.oauth.facebook.get(
+    token = current_app.oauth.facebook.authorize_access_token()
+    resp = current_app.oauth.facebook.get(
         "https://graph.facebook.com/me?fields=id,name,email,picture{url}"
     )
     profile = resp.json()
@@ -92,6 +81,8 @@ def index():
 
 def login():
     """login page."""
+    if current_user.is_authenticated:
+        return redirect(url_for("account.index"))
     form = LoginForm(request.form)
     if form.validate_on_submit():
         login_user(form.user)
@@ -100,7 +91,18 @@ def login():
         return redirect(redirect_url)
     else:
         flash_errors(form)
-    return render_template("account/login.html", form=form)
+
+    return render_template(
+        "account/login.html",
+        form=form,
+        google_api_key=current_app.config["GOOGLE_API_KEY"],
+        google_client_id=current_app.config["GOOGLE_CLIENT_ID"],
+    )
+
+
+@login_manager.unauthorized_handler
+def unauthorized():
+    return render_template("errors/401.html"), 401
 
 
 def id_generator(size=8, chars=string.ascii_uppercase + string.digits):
@@ -220,8 +222,11 @@ def flaskshop_load_blueprints(app):
     google_bp = Blueprint("google", __name__)
     facebook_bp = Blueprint("facebook", __name__)
 
-    google_bp.add_url_rule("/", view_func=google, methods=["GET", "POST"])
-    google_bp.add_url_rule("/auth", view_func=google_auth, methods=["GET", "POST"])
+    google_bp.add_url_rule(
+        "/auth",
+        view_func=google_auth,
+        methods=["POST"],
+    )
 
     facebook_bp.add_url_rule("/", view_func=facebook, methods=["GET", "POST"])
     facebook_bp.add_url_rule("/auth/", view_func=facebook_auth, methods=["GET", "POST"])

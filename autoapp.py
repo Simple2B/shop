@@ -4,7 +4,7 @@ from flaskshop.app import create_app
 from flaskshop.settings import config
 from os import environ as env
 
-environment = env.get("FLASK_ENV", "dev")
+environment = env.get("FLASK_ENV", "development")
 print(environment)
 conf = config[environment]
 print(conf.SQLALCHEMY_DATABASE_URI)

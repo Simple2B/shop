@@ -13,7 +13,7 @@ services:
       PGUSER: ${DB_USER:-postgres}
       PGPASSWORD: ${DB_PASSWD:-secret}
     ports:
-      - 127.0.0.1:${LOCAL_DB_PORT:-5432}:5432
+      - 127.0.0.1:${LOCAL_DB_PORT}:5432
 
   redis:
     image: library/redis:5.0-alpine

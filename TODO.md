@@ -36,3 +36,6 @@
 # Translation
 
 # Set up migrations
+# ES PASSWORD + KIBANA
+# add "oauth" namespace for google and facebook authentications
+# google account MUST be activated

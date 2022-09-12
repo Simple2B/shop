@@ -91,8 +91,9 @@ class Config:
     GA_MEASUREMENT_ID = os.getenv("GA_MEASUREMENT_ID", "")
 
     GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
-    GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_ID")
+    GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
     GOOGLE_ACCESS_TOKEN_URL = "https://accounts.google.com/o/oauth2/token"
+    GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
     FACEBOOK_CLIENT_ID = os.getenv("FACEBOOK_CLIENT_ID")
     FACEBOOK_CLIENT_SECRET = os.getenv("FACEBOOK_CLIENT_SECRET")
@@ -112,12 +113,16 @@ class TestConfig(Config):
 
 
 class DevConfig(Config):
-    ENV = "dev"
+    ENV = "development"
     DEBUG = True
     DEBUG_TB_ENABLED = int(os.getenv("FLASK_DEBUG", 0)) == 1
     DEBUG_TB_INTERCEPT_REDIRECTS = False
     DEBUG_TB_PROFILER_ENABLED = True
     MAIL_DEBUG = DEBUG_TB_ENABLED
+    AUTHLIB_INSECURE_TRANSPORT = True
+    SQLALCHEMY_DATABASE_URI = "sqlite:///" + str(
+        (Path(__file__).parent.parent / "database-test.sqlite3")
+    )
 
 
 class ProdConfig(Config):
