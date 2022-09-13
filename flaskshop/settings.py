@@ -44,9 +44,7 @@ class Config:
 
     GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
     GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
-
-    FACEBOOK_CLIENT_ID = os.getenv("FACEBOOK_CLIENT_ID")
-    FACEBOOK_CLIENT_SECRET = os.getenv("FACEBOOK_CLIENT_SECRET")
+    FACEBOOK_APP_ID = os.getenv("FACEBOOK_APP_ID")
     # Elasticsearch
     # if elasticsearch is enabled, the home page will have a search bar
     # and while add a product, the search index will get update

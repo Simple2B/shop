@@ -39,9 +39,11 @@ def google_auth():
         )
         # if user_data:
         user_data = user_data.json()
-        user = User.query.filter_by(
-            open_id=user_data["sub"], email=user_data["email"]
-        ).first()
+        email_verified = user_data["email_verified"]
+        if not email_verified:
+            flash(lazy_gettext("Please,activate your Google Account"), "error")
+            return redirect("account.index")
+        user = User.query.filter_by(email=user_data["email"]).first()
         if not user:
             user = User.create(
                 open_id=user_data["sub"],
@@ -51,26 +53,37 @@ def google_auth():
                 provider=OpenidProviders.GOOGLE,
             )
         login_user(user)
+        log(log.INFO, f"User logged in.Profile:{user_data}")
     else:
         flash(lazy_gettext("Error while logging in via Google"), "error")
     return redirect(url_for("account.index"))
 
 
-def facebook():
-    # Facebook Oauth Config
-    redirect_uri = url_for("facebook.facebook_auth", _external=True)
-    print(redirect_uri)
-    return current_app.oauth.facebook.authorize_redirect(redirect_uri)
-
-
+@csrf_protect.exempt
 def facebook_auth():
-    token = current_app.oauth.facebook.authorize_access_token()
-    resp = current_app.oauth.facebook.get(
-        "https://graph.facebook.com/me?fields=id,name,email,picture{url}"
-    )
-    profile = resp.json()
-    log(log.INFO, f"Profile:{profile}")
-    return redirect("/")
+    token = request.json["access_token"]
+    user_id = request.json["user_id"]
+    if token:
+        user_data = requests.get(
+            f"https://graph.facebook.com/{user_id}?fields=id,name,email,picture&access_token={token}"
+        )
+        user_data = user_data.json()
+        user = User.query.filter_by(
+            email=user_data["email"],
+        ).first()
+        if not user:
+            user = User.create(
+                open_id=user_data["id"],
+                email=user_data["email"],
+                is_active=True,
+                username=user_data["email"],
+                provider=OpenidProviders.FACEBOOK,
+            )
+        login_user(user)
+        log(log.INFO, f"User logged in.Profile:{user_data}")
+    else:
+        flash(lazy_gettext("Error while logging in via Facebook"), "error")
+    return redirect(url_for("account.index"))
 
 
 def index():
@@ -97,6 +110,7 @@ def login():
         form=form,
         google_api_key=current_app.config["GOOGLE_API_KEY"],
         google_client_id=current_app.config["GOOGLE_CLIENT_ID"],
+        facebook_app_id=current_app.config["FACEBOOK_APP_ID"],
     )
 
 
@@ -228,7 +242,6 @@ def flaskshop_load_blueprints(app):
         methods=["POST"],
     )
 
-    facebook_bp.add_url_rule("/", view_func=facebook, methods=["GET", "POST"])
     facebook_bp.add_url_rule("/auth/", view_func=facebook_auth, methods=["GET", "POST"])
 
     bp.add_url_rule("/", view_func=index, methods=["GET"])

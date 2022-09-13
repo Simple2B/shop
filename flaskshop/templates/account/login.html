@@ -44,7 +44,7 @@
         // let formData = new FormData();
         // formData.append('access_token', access_token);
 
-        fetch("http://127.0.0.1:5000/google/auth", {
+        fetch("{{ url_for('google.google_auth') }}", {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json;',
@@ -78,7 +78,7 @@
 <script>
   window.fbAsyncInit = function () {
     FB.init({
-      appId: '1149560835915908',
+      appId: '{{facebook_app_id}}',
       cookie: true,
       xfbml: true,
       version: 'v14.0'
@@ -86,18 +86,43 @@
 
     FB.AppEvents.logPageView();
 
+  };
+
+  function checkLoginState() {
     FB.getLoginStatus(function (response) {
       statusChangeCallback(response);
     });
+  }
 
-    function checkLoginState() {
-      FB.getLoginStatus(function (response) {
-        statusChangeCallback(response);
+
+  function statusChangeCallback(response) {
+    if (response.status == "connected") {
+      data = JSON.stringify({
+        access_token: response.authResponse.accessToken,
+        user_id: response.authResponse.userID
       });
+
+      fetch("{{ url_for('facebook.facebook_auth') }}", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json;',
+        },
+        credentials: 'include',
+        body: data,
+      })
+        .then((response) => {
+          console.log('Success:', response);
+          if (response.redirected) {
+            window.location.replace(response.url);
+          }
+        })
     }
+    else {
+      console.log('not connected')
+    }
+  }
 
 
-  };
 
   (function (d, s, id) {
     var js, fjs = d.getElementsByTagName(s)[0];
@@ -106,6 +131,7 @@
     js.src = "https://connect.facebook.net/en_US/sdk.js";
     fjs.parentNode.insertBefore(js, fjs);
   }(document, 'script', 'facebook-jssdk'));
+
 </script>
 
 

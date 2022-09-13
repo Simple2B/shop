@@ -26,10 +26,12 @@ services:
   es:
     image: elasticsearch:8.3.3
     restart: unless-stopped
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
+    deploy:
+      resources:
+        limits:
+          memory: 300m
+        # reservations:
+        #   memory: 100m
     environment:
       discovery.type: single-node
     volumes:
