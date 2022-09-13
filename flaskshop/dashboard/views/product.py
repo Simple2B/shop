@@ -4,7 +4,6 @@ from flask import request, render_template, redirect, url_for, current_app
 from flask_babel import lazy_gettext, gettext
 from flaskshop.product.models import (
     ProductAttribute,
-    ProductType,
     Collection,
     Product,
     Category,
