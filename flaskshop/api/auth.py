@@ -2,7 +2,7 @@ from flask import g, current_app
 from flask.sessions import SecureCookieSessionInterface
 from flask_login import user_loaded_from_header
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
-from flask_restplus import Namespace, Resource, fields
+from flask_restplus import Namespace, Resource
 import requests
 
 from flaskshop.extensions import login_manager
@@ -26,7 +26,7 @@ def verify_token(token):
     try:
         serializer = Serializer(current_app.config["SECRET_KEY"], expires_in=36000)
         data = serializer.loads(token)
-    except:
+    except Exception:
         return False
     return data["user_id"]
 
@@ -53,7 +53,7 @@ def load_user_from_request(request):
         user = User.get_by_id(user_id)
         if user:
             return user
-    except:
+    except Exception:
         return None
 
 

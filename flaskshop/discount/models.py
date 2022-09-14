@@ -3,6 +3,7 @@ import string
 from datetime import datetime
 from decimal import Decimal
 
+# flake8: noqa 401
 from flaskshop.corelib.mc import cache, rdb
 from flaskshop.database import Column, Model, db
 from flaskshop.constant import VoucherTypeKinds, DiscountValueTypeKinds

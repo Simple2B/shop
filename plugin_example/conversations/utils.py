@@ -1,6 +1,8 @@
+# flake8: noqa 401
 from .models import Conversation, Message
 
 
+# TODO need logic to Message
 def get_message_count(user):
     """Returns the number of private messages of the given user.
 
