@@ -27,7 +27,7 @@ class User(Model, UserMixin):
     is_active = Column(db.Boolean(), default=False)
     open_id = Column(db.String(80), index=True)
     session_key = Column(db.String(80), index=True)
-    provider = Column(Enum(OpenidProviders), nullable=False)
+    provider = Column(Enum(OpenidProviders), nullable=True)
 
     # def __init__(self, username, email, password, **kwargs):
     #     super().__init__(username=username, email=email, password=password, **kwargs)
