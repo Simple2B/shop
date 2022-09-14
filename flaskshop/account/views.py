@@ -115,7 +115,7 @@ def login():
 
 @login_manager.unauthorized_handler
 def unauthorized():
-    return render_template("errors/401.html"), 401
+    return redirect(url_for("account.login"))
 
 
 def id_generator(size=8, chars=string.ascii_uppercase + string.digits):
