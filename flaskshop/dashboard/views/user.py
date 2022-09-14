@@ -2,6 +2,7 @@ from flask import render_template, redirect, url_for, request, flash
 from sqlalchemy import or_
 from flask_babel import lazy_gettext
 
+# flake8: noqa 401
 from flaskshop.account.models import User, UserAddress, Role, UserRole
 from flaskshop.account.utils import permission_required
 from flaskshop.order.models import Order

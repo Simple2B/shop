@@ -1,7 +1,6 @@
 from flask import Blueprint
 from pluggy import HookimplMarker
 
-from .models import *
 
 impl = HookimplMarker("flaskshop")
 

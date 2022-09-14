@@ -31,8 +31,10 @@ def check_message_box_space(redirect_to=None):
     """
     if get_message_count(current_user) >= current_app.config["MESSAGE_QUOTA"]:
         flash(
-            lazy_gettext("You cannot send any messages anymore because you have reached your message limit.",
-            "danger"),
+            lazy_gettext(
+                "You cannot send any messages anymore because you have reached your message limit.",
+                "danger",
+            ),
         )
         return redirect(redirect_to or url_for("conversations_bp.inbox"))
 
@@ -48,6 +50,7 @@ def require_message_box_space(f):
     return wrapper
 
 
+# flake8: noqa 712
 class Inbox(MethodView):
     decorators = [login_required]
 
@@ -142,7 +145,9 @@ class NewConversation(MethodView):
     def get(self):
         form = self.form()
         form.to_user.data = request.args.get("to_user")
-        return render_template("message_form.html", form=form, title=lazy_gettext("Compose Message"))
+        return render_template(
+            "message_form.html", form=form, title=lazy_gettext("Compose Message")
+        )
 
     def post(self):
         form = self.form()
@@ -249,7 +254,8 @@ class TrashedMessages(MethodView):
 
         conversations = (
             Conversation.query.filter(
-                Conversation.user_id == current_user.id, Conversation.trash == True,
+                Conversation.user_id == current_user.id,
+                Conversation.trash == True,
             )
             .order_by(Conversation.updated_at.desc())
             .paginate(page, 10, False)

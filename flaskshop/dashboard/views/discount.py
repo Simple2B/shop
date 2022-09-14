@@ -2,6 +2,7 @@ from datetime import datetime
 
 from flask import request, render_template, redirect, url_for
 
+# flake8: noqa 401
 from flaskshop.discount.models import Voucher, Sale, SaleCategory, SaleProduct
 from flaskshop.product.models import Product, Category
 from flaskshop.dashboard.forms import VoucherForm, SaleForm
