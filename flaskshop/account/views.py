@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """User views."""
-import os
 from flask import (
     Blueprint,
     render_template,
@@ -9,7 +8,6 @@ from flask import (
     redirect,
     url_for,
     current_app,
-    session,
 )
 from flask_login import login_required, current_user, login_user, logout_user
 from flaskshop.extensions import csrf_protect, login_manager
@@ -27,6 +25,7 @@ from flaskshop.logger import log
 import requests
 
 impl = HookimplMarker("flaskshop")
+
 
 # JS !!!!!
 # how to add https
