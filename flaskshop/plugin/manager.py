@@ -3,7 +3,7 @@ import logging
 import pluggy
 from pkg_resources import iter_entry_points, DistributionNotFound
 
-
+# flake8: noqa 401
 from .models import PluginRegistry
 from .utils import parse_pkg_metadata
 

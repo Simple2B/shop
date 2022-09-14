@@ -2,6 +2,8 @@ from flaskshop.extensions import db, login_manager
 from flaskshop.account.utils import admin_required
 from flaskshop import settings
 from .utils import ApiFlask, ApiResult
+
+# flake8: noqa 401
 from .exceptions import ApiException, httperrors
 from .views import (
     user_del,

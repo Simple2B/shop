@@ -1,7 +1,7 @@
 from functools import wraps
 
 import phonenumbers
-from flask import flash, abort
+from flask import abort
 from flask_login import current_user
 from phonenumbers.phonenumberutil import is_possible_number
 from wtforms import ValidationError

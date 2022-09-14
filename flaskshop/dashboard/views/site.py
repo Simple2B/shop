@@ -6,6 +6,8 @@ from flaskshop.dashboard.models import DashboardMenu, Setting
 from flaskshop.product.models import Category, Collection
 from flaskshop.checkout.models import ShippingMethod
 from flaskshop.plugin.models import PluginRegistry
+
+# flake8: noqa 401
 from flaskshop.account.utils import admin_required, permission_required, Permission
 from flaskshop.dashboard.forms import (
     DashboardMenuForm,
