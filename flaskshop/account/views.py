@@ -107,7 +107,6 @@ def login():
     return render_template(
         "account/login.html",
         form=form,
-        google_api_key=current_app.config["GOOGLE_API_KEY"],
         google_client_id=current_app.config["GOOGLE_CLIENT_ID"],
         facebook_app_id=current_app.config["FACEBOOK_APP_ID"],
     )
