@@ -3,9 +3,10 @@
 from flaskshop.app import create_app
 from flaskshop.settings import config
 from os import environ as env
+from flaskshop.logger import log
 
 environment = env.get("FLASK_ENV", "development")
-print(environment)
+log(log.INFO, "Running app using [%s] environment", environment)
 conf = config[environment]
-print(conf.SQLALCHEMY_DATABASE_URI)
+(log.INFO, "Running app with [%s] db", conf.SQLALCHEMY_DATABASE_URI)
 app = create_app(conf)

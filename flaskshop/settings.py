@@ -7,27 +7,6 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-# class LocalConfig:
-#     db_type = os.getenv("DB_TYPE", "mysql")
-#     user = os.getenv("DB_USER", "postgres")
-#     passwd = os.getenv("DB_PASSWD", "secret")
-#     # host = os.getenv("DB_HOST", "127.0.0.1")
-#     port = os.getenv("LOCAL_DB_PORT", 3306)
-#     db_name = os.getenv("DB_NAME", "db")
-#     if db_type == "postgresql":
-#         db_uri = "postgresql://{user}:{passwd}@{host}:5432/{db_name}".format(
-#             user=user, passwd=passwd, host=host, db_name=db_name
-#         )
-#     elif db_type == "mysql":
-#         db_uri = "mysql+pymysql://{user}:{passwd}@{host}:{port}/{db_name}?charset=utf8mb4".format(
-#             user=user, passwd=passwd, host=host, port=port, db_name=db_name
-#         )
-#     # redis_uri = "redis://127.0.0.1:6379"
-#     # esearch_uri = "localhost:9200"
-#     redis_uri = "redis://redis:6379"
-#     esearch_uri = "http://localhost:9200"
-
-
 class Config:
     SECRET_KEY = os.getenv(
         "SECRET_KEY", "Ensure you set a secret key, this is important!"

@@ -1,7 +1,10 @@
 #!/bin/sh
-# echo Run db upgrade
-# flask db upgrade
-echo Run app
-flask createdb
-flask seed
-flask run -h 0.0.0.0
+
+echo Initiating database ...
+flask db init
+echo Migrating ...
+flask db migrate
+echo Applying migrations ...
+flask db upgrade
+echo Running app
+flask run -h 0.0.0.0 \n

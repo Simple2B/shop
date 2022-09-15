@@ -22,15 +22,12 @@ class User(Model, UserMixin):
     username = Column(db.String(80), unique=True, nullable=False, comment="user`s name")
     email = Column(db.String(80), unique=True, nullable=False)
     #: The hashed password
-    _password = db.Column(db.String, nullable=True, default=None)
+    _password = db.Column(db.String(128), nullable=True, default=None)
     nick_name = Column(db.String(255))
     is_active = Column(db.Boolean(), default=False)
     open_id = Column(db.String(80), index=True)
     session_key = Column(db.String(80), index=True)
     provider = Column(Enum(OpenidProviders), nullable=True)
-
-    # def __init__(self, username, email, password, **kwargs):
-    #     super().__init__(username=username, email=email, password=password, **kwargs)
 
     def __str__(self):
         return self.username

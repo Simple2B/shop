@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 """User views."""
+import random
+import string
+
 from flask import (
     Blueprint,
     render_template,
@@ -10,19 +13,17 @@ from flask import (
     current_app,
 )
 from flask_login import login_required, current_user, login_user, logout_user
-from flaskshop.extensions import csrf_protect, login_manager
 from flask_mail import Message
 from pluggy import HookimplMarker
 from flask_babel import lazy_gettext
-import random
-import string
+import requests
 
-from .forms import AddressForm, LoginForm, RegisterForm, ChangePasswordForm, ResetPasswd
-from .models import OpenidProviders, UserAddress, User
 from flaskshop.utils import flash_errors
 from flaskshop.order.models import Order
 from flaskshop.logger import log
-import requests
+from flaskshop.extensions import csrf_protect, login_manager
+from .forms import AddressForm, LoginForm, RegisterForm, ChangePasswordForm, ResetPasswd
+from .models import OpenidProviders, UserAddress, User
 
 impl = HookimplMarker("flaskshop")
 
@@ -52,7 +53,7 @@ def google_auth():
                 provider=OpenidProviders.GOOGLE,
             )
         login_user(user)
-        log(log.INFO, f"User logged in.Profile:{user_data}")
+        log(log.INFO, "User logged in\n.Profile:[%s]", user_data)
     else:
         flash(lazy_gettext("Error while logging in via Google"), "error")
     return redirect(url_for("account.index"))
@@ -79,7 +80,7 @@ def facebook_auth():
                 provider=OpenidProviders.FACEBOOK,
             )
         login_user(user)
-        log(log.INFO, f"User logged in.Profile:{user_data}")
+        log(log.INFO, "User logged in\n.Profile:[%s]", user_data)
     else:
         flash(lazy_gettext("Error while logging in via Facebook"), "error")
     return redirect(url_for("account.index"))
