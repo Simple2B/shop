@@ -17,7 +17,7 @@ from flask_babel import lazy_gettext
 import random
 import string
 from .forms import AddressForm, LoginForm, RegisterForm, ChangePasswordForm, ResetPasswd
-from .models import UserAddress, User
+from .models import UserAddress, User, gen_password_reset_id
 from flaskshop.utils import flash_errors
 from flaskshop.order.models import Order
 from flaskshop.logger import log
@@ -80,9 +80,44 @@ def facebook_auth():
     return redirect("/")
 
 
+@login_required
 def index():
-    form = ChangePasswordForm(request.form)
+    form = ResetPasswd(request.form)
     orders = Order.get_current_user_orders()
+
+    if form.validate_on_submit():
+        user = current_user
+        user.reset_password_uid = gen_password_reset_id()
+        user.save()
+
+        msg = Message(
+            subject="New password",
+            sender=current_app.config["MAIL_DEFAULT_SENDER"],
+            recipients=[user.email],
+        )
+        msg.html = render_template(
+            "account/partials/email_confirmation.html",
+            user=user,
+            url=url_for(
+                "account.set_password",
+                reset_password_uid=user.reset_password_uid,
+                _external=True,
+            ),
+            config=current_app.config,
+        )
+        current_app.mail.send(msg)
+        flash(
+            lazy_gettext("Confirmation email was sent to"),
+            "success",
+        )
+
+    if form.errors:
+
+        flash(
+            lazy_gettext("Your old password is not valid"),
+            "danger",
+        )
+
     return render_template("account/details.html", form=form, orders=orders)
 
 
@@ -257,7 +292,7 @@ def flaskshop_load_blueprints(app):
     facebook_bp.add_url_rule("/", view_func=facebook, methods=["GET", "POST"])
     facebook_bp.add_url_rule("/auth/", view_func=facebook_auth, methods=["GET", "POST"])
 
-    bp.add_url_rule("/", view_func=index)
+    bp.add_url_rule("/", view_func=index, methods=["GET", "POST"])
     bp.add_url_rule("/login", view_func=login, methods=["GET", "POST"])
     bp.add_url_rule("/resetpwd", view_func=resetpwd, methods=["GET", "POST"])
     bp.add_url_rule("/logout", view_func=logout)

@@ -27,31 +27,19 @@ class RegisterForm(FlaskForm):
 class ResetPasswd(FlaskForm):
     """Password reset"""
 
-    username = StringField(lazy_gettext("Email"), validators=[DataRequired()])
+    old_password = StringField(
+        lazy_gettext("Enter your old password"), validators=[DataRequired()]
+    )
 
     def __init__(self, *args, **kwargs):
         """Create instance."""
         super().__init__(*args, **kwargs)
-        self.user = None
+        self.user = current_user
 
-    def validate(self):
-        """Validate the form."""
-        initial_validation = super().validate()
-        if not initial_validation:
-            return False
+    def validate_old_password(self, field):
 
-        if "@" in self.username.data:
-            self.user = User.query.filter_by(email=self.username.data).first()
-            if not self.user:
-                self.username.errors.append(lazy_gettext("Unknown username"))
-                return False
-            if not self.user.is_active:
-                self.username.errors.append(lazy_gettext("User not activated"))
-                return False
-        else:
-            self.username.errors.append(lazy_gettext("Invalid"))
-            return False
-        return True
+        if not self.user.check_password(field.data):
+            raise ValidationError("Invalid old password")
 
 
 class LoginForm(FlaskForm):
