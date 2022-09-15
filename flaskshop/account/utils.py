@@ -11,14 +11,14 @@ from flaskshop.constant import Permission
 from .models import User
 
 
-def message_sender_for_set_password(user: User):
+def message_sender_for_set_password(user: User, html_dir: str):
     msg = Message(
         subject="New password",
         sender=current_app.config["MAIL_DEFAULT_SENDER"],
         recipients=[user.email],
     )
     msg.html = render_template(
-        "account/partials/email_confirmation.html",
+        html_dir,
         user=user,
         url=url_for(
             "account.set_password",

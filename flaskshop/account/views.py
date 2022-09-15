@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """User views."""
-import os
 from flask import (
     Blueprint,
     render_template,
@@ -79,7 +78,9 @@ def resetpwd():
         user.reset_password_uid = gen_password_reset_id()
         user.save()
 
-        message_to_send = message_sender_for_set_password(user=user)
+        message_to_send = message_sender_for_set_password(
+            user=user, html_dir="account/partials/email_forgot_passwd.html"
+        )
         current_app.mail.send(message_to_send)
 
         flash(
@@ -110,7 +111,9 @@ def signup():
         )
         user.save()
 
-        message_to_send = message_sender_for_set_password(user=user)
+        message_to_send = message_sender_for_set_password(
+            user=user, html_dir="account/partials/email_confirmation.html"
+        )
         current_app.mail.send(message_to_send)
 
         flash(
