@@ -36,9 +36,12 @@ class FlaskForm(_FlaskForm):
             ):
                 continue
             if extra_validators is not None and name in extra_validators:
-                extra = extra_validators[name]
+                pass
+                # extra = extra_validators[name]
             else:
-                extra = tuple()
+                pass
+                # TODO make logic
+                # extra = tuple()
             # if not field.validate(self, extra):
             #     success = False
         return success
@@ -290,7 +293,10 @@ def generate_settings_form(settings):
             if "coerce" in setting.extra:
                 coerce_to = setting.extra["coerce"]
             else:
-                coerce_to = text_type
+                pass
+                # TODO not finish logic
+
+                # coerce_to = text_type
 
             setattr(
                 SettingsForm,
@@ -309,7 +315,9 @@ def generate_settings_form(settings):
             if "coerce" in setting.extra:
                 coerce_to = setting.extra["coerce"]
             else:
-                coerce_to = text_type
+                pass
+                # TODO not finish logic
+                # coerce_to = text_type
 
             setattr(
                 SettingsForm,

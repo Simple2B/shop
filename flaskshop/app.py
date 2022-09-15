@@ -25,6 +25,8 @@ from flaskshop.plugin import spec, manager
 from flaskshop.plugin.models import PluginRegistry
 from flaskshop.utils import log_slow_queries, jinja_global_varibles
 
+
+# flake8: noqa F401
 from .account import views as account_view
 from .checkout import views as checkout_view
 from .discount import views as discount_view

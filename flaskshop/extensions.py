@@ -7,6 +7,8 @@ from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect
 from flask_bootstrap import Bootstrap4
+
+# flake8: noqa F401
 from flask_sqlalchemy import SQLAlchemy, Model, BaseQuery, DefaultMeta, _QueryProperty
 from sqlalchemy import Column, Integer, DateTime, event
 from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
