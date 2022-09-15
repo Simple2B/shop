@@ -87,8 +87,9 @@
         <div class="col-md-8 col-lg-6 m-auto account__password">
           <form method="post" action="">
             <!-- prettier-ignore -->
-            {{ form.csrf_token }}
-            {{ render_field(form.old_password) }}
+            {{ form.hidden_tag() }}
+            {{ render_field(form.password) }}
+            {{ render_field(form.password_confirmation) }}
             <input type="submit" class="btn btn-primary narrow" value="{% trans %}Change password{% endtrans %}" />
           </form>
         </div>

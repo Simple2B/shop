@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 """User forms."""
 from flask_wtf import FlaskForm
-from flask_login import current_user
 from wtforms import PasswordField, StringField, SubmitField, ValidationError
-from wtforms.validators import DataRequired, Email, EqualTo, Length, Regexp
+from wtforms.validators import DataRequired, Email, EqualTo, Length
 from flask_babel import lazy_gettext
 
 from .models import User
@@ -24,22 +23,13 @@ class RegisterForm(FlaskForm):
             raise ValidationError("This email is already registered.")
 
 
-class ResetPasswd(FlaskForm):
-    """Password reset"""
+class ForgotPasswdForm(FlaskForm):
 
-    old_password = StringField(
-        lazy_gettext("Enter your old password"), validators=[DataRequired()]
-    )
+    email = StringField("Email Address", validators=[DataRequired(), Email()])
 
-    def __init__(self, *args, **kwargs):
-        """Create instance."""
-        super().__init__(*args, **kwargs)
-        self.user = current_user
-
-    def validate_old_password(self, field):
-
-        if not self.user.check_password(field.data):
-            raise ValidationError("Invalid old password")
+    def validate_email(form, field):
+        if User.query.filter_by(email=field.data).first() is None:
+            raise ValidationError("Email is not found")
 
 
 class LoginForm(FlaskForm):
@@ -84,7 +74,7 @@ class LoginForm(FlaskForm):
         return True
 
 
-class ChangePasswordForm(FlaskForm):
+class SetPasswordForm(FlaskForm):
     password = PasswordField("Password", validators=[DataRequired(), Length(6, 30)])
     password_confirmation = PasswordField(
         "Confirm Password",
@@ -95,22 +85,13 @@ class ChangePasswordForm(FlaskForm):
     )
     submit = SubmitField("Save")
 
-    # def __init__(self, *args, **kwargs):
-    #     """Create instance."""
-    #     super().__init__(*args, **kwargs)
-    #     self.user = current_user
+    def validate(self):
+        """Validate the form."""
+        initial_validation = super().validate()
+        if not initial_validation:
+            return False
 
-    # def validate(self):
-    #     """Validate the form."""
-    #     initial_validation = super().validate()
-    #     if not initial_validation:
-    #         return False
-
-    #     if not self.user.check_password(self.old_password.data):
-    #         self.old_password.errors.append(lazy_gettext("Invalid password"))
-    #         return False
-
-    #     return True
+        return True
 
 
 class AddressForm(FlaskForm):

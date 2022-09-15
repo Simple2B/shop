@@ -11,13 +11,19 @@ from flask import (
     current_app,
 )
 from flask_login import login_required, current_user, login_user, logout_user
-from flask_mail import Message
 from pluggy import HookimplMarker
 from flask_babel import lazy_gettext
 import random
 import string
-from .forms import AddressForm, LoginForm, RegisterForm, ChangePasswordForm, ResetPasswd
+from .forms import (
+    AddressForm,
+    LoginForm,
+    RegisterForm,
+    SetPasswordForm,
+    ForgotPasswdForm,
+)
 from .models import UserAddress, User, gen_password_reset_id
+from .utils import message_sender_for_set_password
 from flaskshop.utils import flash_errors
 from flaskshop.order.models import Order
 from flaskshop.logger import log
@@ -25,96 +31,22 @@ from flaskshop.logger import log
 impl = HookimplMarker("flaskshop")
 
 
-# @app.route("/google/")
-def google():
-    GOOGLE_CLIENT_ID = current_app.config["GOOGLE_CLIENT_ID"]
-    GOOGLE_CLIENT_SECRET = current_app.config["GOOGLE_CLIENT_SECRET"]
-    CONF_URL = "https://accounts.google.com/.well-known/openid-configuration"
-    current_app.oauth.register(
-        name="google",
-        client_id=GOOGLE_CLIENT_ID,
-        client_secret=GOOGLE_CLIENT_SECRET,
-        server_metadata_url=CONF_URL,
-        client_kwargs={"scope": "openid email profile"},
-    )
-
-    # Redirect to google_auth function
-    redirect_uri = url_for("google.google_auth", _external=True)
-    return current_app.oauth.google.authorize_redirect(redirect_uri)
-
-
-# @app.route("/google/auth/")
-def google_auth():
-    token = current_app.oauth.google.authorize_access_token()
-    user = current_app.oauth.google.parse_id_token(token)
-    log(log.INFO, f"user: {user}")
-    return redirect("/")
-
-
-def facebook():
-    # Facebook Oauth Config
-    FACEBOOK_CLIENT_ID = os.environ.get("FACEBOOK_CLIENT_ID")
-    FACEBOOK_CLIENT_SECRET = os.environ.get("FACEBOOK_CLIENT_SECRET")
-    current_app.oauth.register(
-        name="facebook",
-        client_id=FACEBOOK_CLIENT_ID,
-        client_secret=FACEBOOK_CLIENT_SECRET,
-        access_token_url="https://graph.facebook.com/oauth/access_token",
-        access_token_params=None,
-        authorize_url="https://www.facebook.com/dialog/oauth",
-        authorize_params=None,
-        api_base_url="https://graph.facebook.com/",
-        client_kwargs={"scope": "email"},
-    )
-    redirect_uri = url_for("facebook.facebook_auth", _external=True)
-    return current_app.oauth.facebook.authorize_redirect(redirect_uri)
-
-
-def facebook_auth():
-    token = current_user.oauth.facebook.authorize_access_token()
-    resp = current_user.oauth.facebook.get(
-        "https://graph.facebook.com/me?fields=id,name,email,picture{url}"
-    )
-    profile = resp.json()
-    log(log.INFO, f"Profile:{profile}")
-    return redirect("/")
-
-
 @login_required
 def index():
-    form = ResetPasswd(request.form)
+    form = SetPasswordForm(request.form)
     orders = Order.get_current_user_orders()
 
     if form.validate_on_submit():
         user = current_user
-        user.reset_password_uid = gen_password_reset_id()
+        user.password = form.password_confirmation.data
         user.save()
-
-        msg = Message(
-            subject="New password",
-            sender=current_app.config["MAIL_DEFAULT_SENDER"],
-            recipients=[user.email],
-        )
-        msg.html = render_template(
-            "account/partials/email_confirmation.html",
-            user=user,
-            url=url_for(
-                "account.set_password",
-                reset_password_uid=user.reset_password_uid,
-                _external=True,
-            ),
-            config=current_app.config,
-        )
-        current_app.mail.send(msg)
         flash(
-            lazy_gettext("Confirmation email was sent to"),
+            lazy_gettext("Update passport was successful"),
             "success",
         )
-
     if form.errors:
-
         flash(
-            lazy_gettext("Your old password is not valid"),
+            lazy_gettext("Password does not match"),
             "danger",
         )
 
@@ -140,24 +72,20 @@ def id_generator(size=8, chars=string.ascii_uppercase + string.digits):
 
 def resetpwd():
     """Reset user password"""
-    form = ResetPasswd(request.form)
+    form = ForgotPasswdForm(request.form)
 
     if form.validate_on_submit():
-        flash(lazy_gettext("Check your e-mail."), "success")
-        user = User.query.filter_by(email=form.username.data).first()
-        new_passwd = id_generator()
-        body = render_template("account/reser_passwd_mail.html", new_passwd=new_passwd)
-        msg = Message(lazy_gettext("Reset Password"), recipients=[form.username.data])
-        msg.body = lazy_gettext(
-            """We cannot simply send you your old password.\n
-        A unique password has been generated for you. Change the password after logging in.\n
-        New Password is: %s"""
-            % new_passwd
+        user = User.query.filter_by(email=form.email.data).first()
+        user.reset_password_uid = gen_password_reset_id()
+        user.save()
+
+        message_to_send = message_sender_for_set_password(user=user)
+        current_app.mail.send(message_to_send)
+
+        flash(
+            lazy_gettext(f"Confirmation email was sent to {form.email.data.lower()}"),
+            "success",
         )
-        msg.html = body
-        mail = current_app.extensions.get("mail")
-        mail.send(msg)
-        user.update(password=new_passwd)
         return redirect(url_for("account.login"))
     else:
         flash_errors(form)
@@ -181,23 +109,10 @@ def signup():
             email=form.email.data.lower(),
         )
         user.save()
-        # send mail to the user
-        msg = Message(
-            subject="New password",
-            sender=current_app.config["MAIL_DEFAULT_SENDER"],
-            recipients=[user.email],
-        )
-        msg.html = render_template(
-            "account/partials/email_confirmation.html",
-            user=user,
-            url=url_for(
-                "account.set_password",
-                reset_password_uid=user.reset_password_uid,
-                _external=True,
-            ),
-            config=current_app.config,
-        )
-        current_app.mail.send(msg)
+
+        message_to_send = message_sender_for_set_password(user=user)
+        current_app.mail.send(message_to_send)
+
         flash(
             lazy_gettext(f"Confirmation email was sent to {form.email.data.lower()}"),
             "success",
@@ -218,7 +133,7 @@ def set_password(reset_password_uid: str):
         flash("Incorrect reset password link", "danger")
         return redirect(url_for("account.index"))
 
-    form = ChangePasswordForm(request.form)
+    form = SetPasswordForm(request.form)
 
     if form.validate_on_submit():
         user.password = form.password.data
@@ -283,15 +198,6 @@ def delete_address(id):
 @impl
 def flaskshop_load_blueprints(app):
     bp = Blueprint("account", __name__)
-    google_bp = Blueprint("google", __name__)
-    facebook_bp = Blueprint("facebook", __name__)
-
-    google_bp.add_url_rule("/", view_func=google, methods=["GET", "POST"])
-    google_bp.add_url_rule("/auth", view_func=google_auth, methods=["GET", "POST"])
-
-    facebook_bp.add_url_rule("/", view_func=facebook, methods=["GET", "POST"])
-    facebook_bp.add_url_rule("/auth/", view_func=facebook_auth, methods=["GET", "POST"])
-
     bp.add_url_rule("/", view_func=index, methods=["GET", "POST"])
     bp.add_url_rule("/login", view_func=login, methods=["GET", "POST"])
     bp.add_url_rule("/resetpwd", view_func=resetpwd, methods=["GET", "POST"])
@@ -307,5 +213,3 @@ def flaskshop_load_blueprints(app):
     )
 
     app.register_blueprint(bp, url_prefix="/account")
-    app.register_blueprint(google_bp, url_prefix="/google")
-    app.register_blueprint(facebook_bp, url_prefix="/facebook")

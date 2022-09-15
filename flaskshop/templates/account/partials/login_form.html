@@ -1,11 +1,13 @@
 {% from 'bootstrap4/form.html' import render_field %}
 <form method="post" action="" id="loginForm" novalidate>
   <fieldset>
-    {{ form.csrf_token }}
+    {{ form.hidden_tag() }}
     <!-- prettier-ignore -->
-    {{ render_field(form.username) }}
     {% if not reset %}
+    {{ render_field(form.username) }}
     {{ render_field(form.password) }}
+    {% else %}
+    {{ render_field(form.email) }}
     {% endif %}
   </fieldset>
   <div class="row login__btn-group">
@@ -26,13 +28,13 @@
       <hr />
       <div class="row">
         <div class="col-sm-6 col-md-12 col-xl-6">
-          <a class="btn social-btn facebook" href="{{ url_for('facebook.facebook') }}">
+          <a class="btn social-btn facebook" href="#">
             <svg data-src="{{ url_for('static', filename='img/social/login/facebook.svg') }}" width="18" height="18" />
             <small>Facebook</small>
           </a>
         </div>
         <div class="col-sm-6 col-md-12 col-xl-6">
-          <a class="btn social-btn google" href="{{ url_for('google.google') }}">
+          <a class="btn social-btn google" href="#">
             <svg data-src="{{ url_for('static', filename='img/social/login/google.svg') }}" width="18" height="18" />
             <small>Google</small>
           </a>

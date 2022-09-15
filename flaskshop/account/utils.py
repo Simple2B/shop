@@ -1,12 +1,33 @@
 from functools import wraps
 
 import phonenumbers
-from flask import abort
+from flask import abort, url_for, current_app, render_template
 from flask_login import current_user
+from flask_mail import Message
 from phonenumbers.phonenumberutil import is_possible_number
 from wtforms import ValidationError
 
 from flaskshop.constant import Permission
+from .models import User
+
+
+def message_sender_for_set_password(user: User):
+    msg = Message(
+        subject="New password",
+        sender=current_app.config["MAIL_DEFAULT_SENDER"],
+        recipients=[user.email],
+    )
+    msg.html = render_template(
+        "account/partials/email_confirmation.html",
+        user=user,
+        url=url_for(
+            "account.set_password",
+            reset_password_uid=user.reset_password_uid,
+            _external=True,
+        ),
+        config=current_app.config,
+    )
+    return msg
 
 
 class PhoneNumber(phonenumbers.PhoneNumber):

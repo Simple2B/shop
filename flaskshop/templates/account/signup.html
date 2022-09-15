@@ -22,7 +22,7 @@
         <fieldset>
           <h3>{% trans %}Create an account{% endtrans %}</h3>
           <!-- prettier-ignore -->
-          {{ form.csrf_token }}
+          {{ form.hidden_tag() }}
           {{ render_field(form.username) }}
           {{ render_field(form.email) }}
         </fieldset>
