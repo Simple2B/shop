@@ -11,7 +11,7 @@ from .models import User
 class RegisterForm(FlaskForm):
     """Register form."""
 
-    username = StringField("Username", validators=[DataRequired(), Length(2, 30)])
+    username = StringField("Username", validators=[DataRequired(), Length(5, 30)])
     email = StringField("Email Address", validators=[DataRequired(), Email()])
 
     def validate_username(form, field):

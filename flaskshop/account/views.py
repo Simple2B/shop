@@ -44,6 +44,7 @@ def index():
             "success",
         )
     if form.errors:
+        log(log.WARNING, "form error: [%s]", form.errors)
         flash(
             lazy_gettext("Password does not match"),
             "danger",
@@ -61,6 +62,7 @@ def login():
         flash(lazy_gettext("You are log in."), "success")
         return redirect(redirect_url)
     else:
+        log(log.ERROR, "Invalid data [%s]", form.errors)
         flash_errors(form)
     return render_template("account/login.html", form=form)
 
@@ -89,6 +91,7 @@ def resetpwd():
         )
         return redirect(url_for("account.login"))
     else:
+        log(log.ERROR, "Invalid data [%s]", form.errors)
         flash_errors(form)
     return render_template("account/login.html", form=form, reset=True)
 
@@ -122,6 +125,7 @@ def signup():
         )
         return redirect(url_for("public.home"))
     else:
+        log(log.ERROR, "Invalid data [%s]", form.errors)
         flash_errors(form)
     return render_template("account/signup.html", form=form)
 
@@ -185,6 +189,7 @@ def edit_address():
             flash(lazy_gettext("Success add address."), "success")
         return redirect(url_for("account.index") + "#addresses")
     else:
+        log(log.ERROR, "Invalid data [%s]", form.errors)
         flash_errors(form)
     return render_template(
         "account/address_edit.html", form=form, address_id=address_id
