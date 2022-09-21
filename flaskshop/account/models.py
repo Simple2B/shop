@@ -17,8 +17,10 @@ class OpenidProviders(enum.Enum):
     GOOGLE = 1
     FACEBOOK = 2
 
+
 def gen_password_reset_id() -> str:
     return str(uuid4())
+
 
 class User(Model, UserMixin):
 

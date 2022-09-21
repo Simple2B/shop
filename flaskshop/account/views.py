@@ -18,13 +18,21 @@ from flask_babel import lazy_gettext
 import requests
 
 from flaskshop.utils import flash_errors
+from .utils import message_sender_for_set_password
 from flaskshop.order.models import Order
 from flaskshop.logger import log
 from flaskshop.extensions import csrf_protect, login_manager
-from .forms import AddressForm, LoginForm, RegisterForm, ChangePasswordForm, ResetPasswd
-from .models import OpenidProviders, UserAddress, User
+from .forms import (
+    AddressForm,
+    LoginForm,
+    RegisterForm,
+    SetPasswordForm,
+    ForgotPasswdForm,
+)
+from .models import OpenidProviders, UserAddress, User, gen_password_reset_id
 
 impl = HookimplMarker("flaskshop")
+
 
 @csrf_protect.exempt
 def google_auth():
@@ -80,6 +88,7 @@ def facebook_auth():
     else:
         flash(lazy_gettext("Error while logging in via Facebook"), "error")
     return redirect(url_for("account.index"))
+
 
 @login_required
 def index():
@@ -270,7 +279,7 @@ def delete_address(id):
 @impl
 def flaskshop_load_blueprints(app):
     bp = Blueprint("account", __name__)
-    
+
     google_bp = Blueprint("google", __name__)
     facebook_bp = Blueprint("facebook", __name__)
 
