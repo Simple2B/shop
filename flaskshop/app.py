@@ -42,7 +42,6 @@ from .dashboard_api.api_app import dashboard_api
 babel = Babel()
 ckeditor = CKEditor()
 migrate = Migrate()
-mail = Mail()
 
 
 def create_app(config_object=Config):
@@ -59,6 +58,7 @@ def create_app(config_object=Config):
     log_slow_queries(app)
     app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {"/dashboard_api": dashboard_api})
     app.oauth = OAuth(app)
+    app.mail = Mail(app)
     return app
 
 
@@ -73,7 +73,6 @@ def register_extensions(app):
     babel.init_app(app)
     ckeditor.init_app(app)
     migrate.init_app(app, db)
-    mail.init_app(app)
 
 
 def register_blueprints(app):

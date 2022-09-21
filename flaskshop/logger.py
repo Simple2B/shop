@@ -1,8 +1,7 @@
 import logging
 import sys
 
-LOGGER_NAME = "SimpleAppLog"
-
+LOGGER_NAME = "Simple2BShopLog"
 
 class Logger(object):
     # __created_std_out = False

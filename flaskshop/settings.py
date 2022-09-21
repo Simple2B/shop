@@ -17,6 +17,7 @@ class Config:
     #   - save product description
     #   - save page content
     USE_REDIS = int(os.getenv("USE_REDIS", 0)) == 1
+
     REDIS_URL = os.getenv(
         "REDIS_URI",
     )
@@ -24,6 +25,7 @@ class Config:
     GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
     GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
     FACEBOOK_APP_ID = os.getenv("FACEBOOK_APP_ID")
+
     # Elasticsearch
     # if elasticsearch is enabled, the home page will have a search bar
     # and while add a product, the search index will get update

@@ -1,11 +1,13 @@
 from operator import or_
 from functools import reduce
 import enum
+from uuid import uuid4
+from libgravatar import Gravatar
 
 from flask_login import UserMixin
-from libgravatar import Gravatar
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.types import Enum
+
 from flaskshop.database import Column, Model, db
 from flaskshop.extensions import bcrypt
 from flaskshop.constant import Permission
@@ -15,6 +17,8 @@ class OpenidProviders(enum.Enum):
     GOOGLE = 1
     FACEBOOK = 2
 
+def gen_password_reset_id() -> str:
+    return str(uuid4())
 
 class User(Model, UserMixin):
 
@@ -28,6 +32,7 @@ class User(Model, UserMixin):
     open_id = Column(db.String(80), index=True)
     session_key = Column(db.String(80), index=True)
     provider = Column(Enum(OpenidProviders), nullable=True)
+    reset_password_uid = db.Column(db.String(64), default=gen_password_reset_id)
 
     def __str__(self):
         return self.username
