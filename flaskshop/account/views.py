@@ -121,7 +121,6 @@ def login():
     return render_template(
         "account/login.html",
         form=form,
-        google_api_key=current_app.config["GOOGLE_API_KEY"],
         google_client_id=current_app.config["GOOGLE_CLIENT_ID"],
         facebook_app_id=current_app.config["FACEBOOK_APP_ID"],
     )
@@ -129,7 +128,7 @@ def login():
 
 @login_manager.unauthorized_handler
 def unauthorized():
-    return render_template("errors/401.html"), 401
+    return redirect(url_for("account.login"))
 
 
 def id_generator(size=8, chars=string.ascii_uppercase + string.digits):
