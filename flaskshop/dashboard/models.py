@@ -6,11 +6,11 @@ from flaskshop.constant import SettingValueType
 
 class DashboardMenu(Model):
     __tablename__ = "management_dashboard"
-    title = Column(db.String(255), nullable=False)
-    order = Column(db.Integer(), default=0)
-    endpoint = Column(db.String(255))
-    icon_cls = Column(db.String(255))
-    parent_id = Column(db.Integer(), default=0)
+    title = Column(db.String(256), nullable=False)
+    order = Column(db.Integer, default=0)
+    endpoint = Column(db.String(256))
+    icon_cls = Column(db.String(256))
+    parent_id = Column(db.Integer, default=0)
 
     def __str__(self):
         return self.title
@@ -40,10 +40,10 @@ class DashboardMenu(Model):
 class Setting(Model):
     __tablename__ = "management_setting"
     id = None
-    key = Column(db.String(255), primary_key=True)
+    key = Column(db.String(256), primary_key=True)
     value = Column(db.PickleType, nullable=False)
-    name = Column(db.String(255), nullable=False)
-    description = Column(db.Text, nullable=False)
+    name = Column(db.String(256), nullable=False)
+    description = Column(db.String(512), nullable=False)
     value_type = Column(db.Enum(SettingValueType), nullable=False)
     extra = Column(db.PickleType)
 

@@ -23,7 +23,11 @@
 
       <li class="nav-item">
         <a class="nav-link" data-toggle="tab" href="#password" role="tab">
+          {% if current_user.password %}
           <h3>{% trans %}Change password{% endtrans %}</h3>
+          {% else %}
+          <h3>{% trans %}Set password{% endtrans %}</h3>
+          {% endif %}
         </a>
       </li>
 
@@ -90,7 +94,13 @@
             {{ form.hidden_tag() }}
             {{ render_field(form.password) }}
             {{ render_field(form.password_confirmation) }}
-            <input type="submit" class="btn btn-primary narrow" value="{% trans %}Change password{% endtrans %}" />
+            <input type="submit" class="btn btn-primary narrow" value="
+            {% if current_user.password %}
+            {% trans %}Change password{% endtrans %}
+             {% else %}
+              {% trans %}Set password{% endtrans %}
+             {% endif %}
+            " />
           </form>
         </div>
       </div>

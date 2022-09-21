@@ -29,7 +29,7 @@ from .forms import (
     SetPasswordForm,
     ForgotPasswdForm,
 )
-from .models import OpenidProviders, UserAddress, User, gen_password_reset_id
+from .models import UserAddress, User, gen_password_reset_id
 
 impl = HookimplMarker("flaskshop")
 
@@ -54,7 +54,6 @@ def google_auth():
                 email=user_data["email"],
                 is_active=True,
                 username=user_data["email"],
-                provider=OpenidProviders.GOOGLE,
             )
         login_user(user)
         log(log.INFO, "User logged in\n.Profile:[%s]", user_data)
@@ -81,7 +80,6 @@ def facebook_auth():
                 email=user_data["email"],
                 is_active=True,
                 username=user_data["email"],
-                provider=OpenidProviders.FACEBOOK,
             )
         login_user(user)
         log(log.INFO, "User logged in\n.Profile:[%s]", user_data)
@@ -92,6 +90,7 @@ def facebook_auth():
 
 @login_required
 def index():
+    # if current_user.password is not None:
     form = SetPasswordForm(request.form)
     orders = Order.get_current_user_orders()
 
@@ -121,7 +120,7 @@ def login():
     if form.validate_on_submit():
         login_user(form.user)
         redirect_url = request.args.get("next") or url_for("public.home")
-        flash(lazy_gettext("You are log in."), "success")
+        flash(lazy_gettext("You are logged in"), "success")
         return redirect(redirect_url)
     else:
         log(log.ERROR, "Invalid data [%s]", form.errors)

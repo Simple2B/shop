@@ -13,11 +13,6 @@ from flaskshop.extensions import bcrypt
 from flaskshop.constant import Permission
 
 
-class OpenidProviders(enum.Enum):
-    GOOGLE = 1
-    FACEBOOK = 2
-
-
 def gen_password_reset_id() -> str:
     return str(uuid4())
 
@@ -25,15 +20,14 @@ def gen_password_reset_id() -> str:
 class User(Model, UserMixin):
 
     __tablename__ = "account_user"
-    username = Column(db.String(80), unique=True, nullable=False, comment="user`s name")
-    email = Column(db.String(80), unique=True, nullable=False)
+    username = Column(db.String(64), unique=True, nullable=False, comment="user`s name")
+    email = Column(db.String(64), unique=True, nullable=False)
     #: The hashed password
     _password = db.Column(db.String(128), nullable=True, default=None)
-    nick_name = Column(db.String(255))
-    is_active = Column(db.Boolean(), default=False)
-    open_id = Column(db.String(80), index=True)
-    session_key = Column(db.String(80), index=True)
-    provider = Column(Enum(OpenidProviders), nullable=True)
+    nick_name = Column(db.String(64))
+    is_active = Column(db.Boolean, default=False)
+    open_id = Column(db.String(64), index=True)
+    session_key = Column(db.String(128), index=True)
     reset_password_uid = db.Column(db.String(64), default=gen_password_reset_id)
 
     def __str__(self):
@@ -95,13 +89,13 @@ class User(Model, UserMixin):
 
 class UserAddress(Model):
     __tablename__ = "account_address"
-    user_id = Column(db.Integer())
-    province = Column(db.String(255))
-    city = Column(db.String(255))
-    district = Column(db.String(255))
-    address = Column(db.String(255))
-    contact_name = Column(db.String(255))
-    contact_phone = Column(db.String(80))
+    user_id = Column(db.Integer)
+    province = Column(db.String(256))
+    city = Column(db.String(256))
+    district = Column(db.String(256))
+    address = Column(db.String(256))
+    contact_name = Column(db.String(256))
+    contact_phone = Column(db.String(64))
 
     @property
     def full_address(self):
@@ -120,7 +114,7 @@ class UserAddress(Model):
 
 class Role(Model):
     __tablename__ = "account_role"
-    name = Column(db.String(80), unique=True)
+    name = Column(db.String(64), unique=True)
     permissions = Column(db.Integer(), default=Permission.LOGIN)
 
 

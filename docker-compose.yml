@@ -13,15 +13,15 @@ services:
       PGUSER: ${DB_USER:-postgres}
       PGPASSWORD: ${DB_PASSWD:-secret}
     ports:
-      - ${LOCAL_DB_PORT}:5432
+      - 127.0.0.1:${LOCAL_DB_PORT:-5432}:5432
 
   redis:
     image: library/redis:5.0-alpine
     restart: unless-stopped
     volumes:
       - redis-data:/data
-    # ports:
-    #   - 127.0.0.1:${LOCAL_REDIS_PORT:-6379}:6379
+    ports:
+      - 127.0.0.1:${LOCAL_REDIS_PORT:-6379}:6379
 
   es:
     image: elasticsearch:8.3.3
@@ -36,8 +36,8 @@ services:
       discovery.type: single-node
     volumes:
       - es-data:/usr/share/elasticsearch/data
-    # ports:
-    #   - 127.0.0.1:${LOCAL_ES_PORT:-9200}:9200
+    ports:
+      - 127.0.0.1:${LOCAL_ES_PORT:-9200}:9200
 
   web:
     build: .
@@ -49,7 +49,7 @@ services:
       - redis
       - es
     ports:
-      - ${LOCAL_WEB_PORT}:5000
+      - 127.0.0.1:${LOCAL_WEB_PORT:-5000}:5000
     environment:
       REDIS_URI: ${REDIS_URI}
       ESEARCH_URI: ${ESEARCH_URI}

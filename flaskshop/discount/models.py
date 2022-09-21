@@ -16,15 +16,15 @@ MC_KEY_SALE_PRODUCT_IDS = "discount:sale:{}:product_ids"
 class Voucher(Model):
     __tablename__ = "discount_voucher"
     type_ = Column("type", db.Integer())
-    title = Column(db.String(255))
+    title = Column(db.String(256))
     code = Column(db.String(16), unique=True)
-    usage_limit = Column(db.Integer())
+    usage_limit = Column(db.Integer)
     used = Column(db.Integer(), default=0)
     start_date = Column(db.Date())
     end_date = Column(db.Date())
     discount_value_type = Column(db.Integer())
     discount_value = Column(db.DECIMAL(10, 2))
-    limit = Column(db.DECIMAL(10, 2))
+    limit = Column(db.Float)
     category_id = Column(db.Integer())
     product_id = Column(db.Integer())
 
@@ -129,8 +129,8 @@ class Voucher(Model):
 class Sale(Model):
     __tablename__ = "discount_sale"
     discount_value_type = Column(db.Integer())
-    title = Column(db.String(255))
-    discount_value = Column(db.DECIMAL(10, 2))
+    title = Column(db.String(256))
+    discount_value = Column(db.Float)
 
     def __str__(self):
         return self.title
@@ -154,7 +154,7 @@ class Sale(Model):
         if sale.discount_value_type == DiscountValueTypeKinds.fixed.value:
             return sale.discount_value
         elif sale.discount_value_type == DiscountValueTypeKinds.percent.value:
-            price = round(Decimal(product.basic_price) * sale.discount_value / 100, 2)
+            price = round((product.basic_price) * sale.discount_value / 100, 2)
             return Decimal(price).quantize(Decimal("0.00"))
 
     @property

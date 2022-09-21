@@ -23,7 +23,7 @@ MC_KEY_CATEGORY_CHILDREN = "product:category:{}:children"
 
 class Product(Model):
     __tablename__ = "product_product"
-    title = Column(db.String(255), nullable=False)
+    title = Column(db.String(256), nullable=False)
     on_sale = Column(db.Boolean(), default=True)
     rating = Column(db.Float(), default=5.0)
     sold_count = Column(db.Integer(), default=0)
@@ -216,7 +216,7 @@ class Product(Model):
 
 class Category(Model):
     __tablename__ = "product_category"
-    title = Column(db.String(255), nullable=False)
+    title = Column(db.String(256), nullable=False)
     parent_id = Column(db.Integer(), default=0)
     background_img = Column(db.String(255))
 
@@ -319,7 +319,7 @@ class ProductTypeVariantAttributes(Model):
 
 class ProductType(Model):
     __tablename__ = "product_type"
-    title = Column(db.String(255), nullable=False)
+    title = Column(db.String(256), nullable=False)
     has_variants = Column(db.Boolean(), default=True)
     is_shipping_required = Column(db.Boolean(), default=False)
 
@@ -415,8 +415,8 @@ class ProductType(Model):
 class ProductVariant(Model):
     __tablename__ = "product_variant"
     sku = Column(db.String(32), unique=True)
-    title = Column(db.String(255))
-    price_override = Column(db.DECIMAL(10, 2), default=0.00)
+    title = Column(db.String(256))
+    price_override = Column(db.Float, default=0.00)
     quantity = Column(db.Integer(), default=0)
     quantity_allocated = Column(db.Integer(), default=0)
     product_id = Column(db.Integer(), default=0)
@@ -498,7 +498,7 @@ class ProductVariant(Model):
 
 class ProductAttribute(Model):
     __tablename__ = "product_attribute"
-    title = Column(db.String(255), nullable=False)
+    title = Column(db.String(256), nullable=False)
 
     def __str__(self):
         return self.title
@@ -596,7 +596,7 @@ class ProductAttribute(Model):
 
 class AttributeChoiceValue(Model):
     __tablename__ = "product_attribute_value"
-    title = Column(db.String(255), nullable=False)
+    title = Column(db.String(256), nullable=False)
     attribute_id = Column(db.Integer())
 
     def __str__(self):
@@ -609,7 +609,7 @@ class AttributeChoiceValue(Model):
 
 class ProductImage(Model):
     __tablename__ = "product_image"
-    image = Column(db.String(255))
+    image = Column(db.String(256))
     order = Column(db.Integer())
     product_id = Column(db.Integer())
 
@@ -636,8 +636,8 @@ class ProductImage(Model):
 
 class Collection(Model):
     __tablename__ = "product_collection"
-    title = Column(db.String(255), nullable=False)
-    background_img = Column(db.String(255))
+    title = Column(db.String(256), nullable=False)
+    background_img = Column(db.String(256))
 
     def __str__(self):
         return self.title

@@ -17,16 +17,16 @@ from flaskshop.discount.models import Voucher
 
 class Order(Model):
     __tablename__ = "order_order"
-    token = Column(db.String(100), unique=True)
-    shipping_address = Column(db.String(255))
+    token = Column(db.String(128), unique=True)
+    shipping_address = Column(db.String(256))
     user_id = Column(db.Integer())
-    total_net = Column(db.DECIMAL(10, 2))
-    discount_amount = Column(db.DECIMAL(10, 2), default=0)
-    discount_name = Column(db.String(100))
-    voucher_id = Column(db.Integer())
-    shipping_price_net = Column(db.DECIMAL(10, 2))
+    total_net = Column(db.Float)
+    discount_amount = Column(db.Float, default=0)
+    discount_name = Column(db.String(128))
+    voucher_id = Column(db.Integer)
+    shipping_price_net = Column(db.Float)
     status = Column(db.Integer())
-    shipping_method_name = Column(db.String(100))
+    shipping_method_name = Column(db.String(128))
     shipping_method_id = Column(db.Integer())
     ship_status = Column(db.Integer())
 
@@ -246,10 +246,10 @@ class Order(Model):
 
 class OrderLine(Model):
     __tablename__ = "order_line"
-    product_name = Column(db.String(255))
-    product_sku = Column(db.String(100))
+    product_name = Column(db.String(256))
+    product_sku = Column(db.String(128))
     quantity = Column(db.Integer())
-    unit_price_net = Column(db.DECIMAL(10, 2))
+    unit_price_net = Column(db.Float)
     is_shipping_required = Column(db.Boolean(), default=True)
     order_id = Column(db.Integer())
     variant_id = Column(db.Integer())
@@ -265,23 +265,23 @@ class OrderLine(Model):
 
 class OrderNote(Model):
     __tablename__ = "order_note"
-    order_id = Column(db.Integer())
-    user_id = Column(db.Integer())
-    content = Column(db.Text())
-    is_public = Column(db.Boolean(), default=True)
+    order_id = Column(db.Integer)
+    user_id = Column(db.Integer)
+    content = Column(db.Text)
+    is_public = Column(db.Boolean, default=True)
 
 
 class OrderPayment(Model):
     __tablename__ = "order_payment"
-    order_id = Column(db.Integer())
+    order_id = Column(db.Integer)
     status = Column(db.Integer)
-    total = Column(db.DECIMAL(10, 2))
-    delivery = Column(db.DECIMAL(10, 2))
-    description = Column(db.Text())
-    customer_ip_address = Column(db.String(100))
-    token = Column(db.String(100))
-    payment_method = Column(db.String(255))
-    payment_no = Column(db.String(255), unique=True)
+    total = Column(db.Float)
+    delivery = Column(db.Float)
+    description = Column(db.String(512))
+    customer_ip_address = Column(db.String(64))
+    token = Column(db.String(128))
+    payment_method = Column(db.String(256))
+    payment_no = Column(db.String(256), unique=True)
     paid_at = Column(db.DateTime())
 
     def pay_success(self, paid_at):

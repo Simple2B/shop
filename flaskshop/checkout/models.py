@@ -13,7 +13,7 @@ MC_KEY_CART_BY_USER = "checkout:cart:user_id:{}"
 class Cart(Model):
     __tablename__ = "checkout_cart"
     user_id = Column(db.Integer())
-    voucher_code = Column(db.String(255))
+    voucher_code = Column(db.String(256))
     quantity = Column(db.Integer())
     shipping_address_id = Column(db.Integer())
     shipping_method_id = Column(db.Integer())
@@ -165,8 +165,8 @@ class CartLine(Model):
 
 class ShippingMethod(Model):
     __tablename__ = "checkout_shippingmethod"
-    title = Column(db.String(255), nullable=False)
-    price = Column(db.DECIMAL(10, 2))
+    title = Column(db.String(256), nullable=False)
+    price = Column(db.Float)
 
     def __str__(self):
         return self.title + "   $" + str(self.price)

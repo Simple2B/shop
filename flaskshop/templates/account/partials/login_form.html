@@ -3,13 +3,13 @@
   <fieldset>
     {{ form.hidden_tag() }}
     <!-- prettier-ignore -->
-{% if not reset %}
+    {% if not reset %}
     {{ render_field(form.username) }}
     {{ render_field(form.password) }}
     {% else %}
     {{ render_field(form.email) }}
     {% endif %}
-    
+
   </fieldset>
   <div class="row login__btn-group">
     <div class="col-sm-12">
@@ -31,6 +31,7 @@
   </div>
 </form>
 
+{% if not reset %}
 <div class="row">
   <div class="col-sm-6 col-md-12 col-xl-6">
     <button class="btn social-btn google" id="authorize_button">
@@ -44,9 +45,9 @@
         data-button-type="login_with" data-layout="rounded" data-auto-logout-link="false" data-use-continue-as="false">
         Login</div>
     </button>
-    
+
     <div id="fb-root"></div>
-    
+
   </div>
 </div>
-
+{% endif %}
