@@ -3,7 +3,6 @@ import sys
 
 LOGGER_NAME = "Simple2BShopLog"
 
-
 class Logger(object):
     # __created_std_out = False
     log_file = bytes

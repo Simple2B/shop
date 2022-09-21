@@ -35,4 +35,8 @@
 
 # Translation
 
+# Set up migrations
+# ES PASSWORD + KIBANA
+# google account MUST be activated
+# If user loggined via oauth provider , there couldnt be "old_password" field
 # Fill up .env-sample

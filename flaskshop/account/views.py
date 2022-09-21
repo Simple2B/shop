@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 """User views."""
+import random
+import string
+
 from flask import (
     Blueprint,
     render_template,
@@ -12,23 +15,71 @@ from flask import (
 from flask_login import login_required, current_user, login_user, logout_user
 from pluggy import HookimplMarker
 from flask_babel import lazy_gettext
-import random
-import string
-from .forms import (
-    AddressForm,
-    LoginForm,
-    RegisterForm,
-    SetPasswordForm,
-    ForgotPasswdForm,
-)
-from .models import UserAddress, User, gen_password_reset_id
-from .utils import message_sender_for_set_password
+import requests
+
 from flaskshop.utils import flash_errors
 from flaskshop.order.models import Order
 from flaskshop.logger import log
+from flaskshop.extensions import csrf_protect, login_manager
+from .forms import AddressForm, LoginForm, RegisterForm, ChangePasswordForm, ResetPasswd
+from .models import OpenidProviders, UserAddress, User
 
 impl = HookimplMarker("flaskshop")
 
+@csrf_protect.exempt
+def google_auth():
+    token = request.json["access_token"]
+    if token:
+        user_data = requests.get(
+            f"https://openidconnect.googleapis.com/v1/userinfo?access_token={token}"
+        )
+        # if user_data:
+        user_data = user_data.json()
+        email_verified = user_data["email_verified"]
+        if not email_verified:
+            flash(lazy_gettext("Please,activate your Google Account"), "error")
+            return redirect("account.index")
+        user = User.query.filter_by(email=user_data["email"]).first()
+        if not user:
+            user = User.create(
+                open_id=user_data["sub"],
+                email=user_data["email"],
+                is_active=True,
+                username=user_data["email"],
+                provider=OpenidProviders.GOOGLE,
+            )
+        login_user(user)
+        log(log.INFO, "User logged in\n.Profile:[%s]", user_data)
+    else:
+        flash(lazy_gettext("Error while logging in via Google"), "error")
+    return redirect(url_for("account.index"))
+
+
+@csrf_protect.exempt
+def facebook_auth():
+    token = request.json["access_token"]
+    user_id = request.json["user_id"]
+    if token:
+        user_data = requests.get(
+            f"https://graph.facebook.com/{user_id}?fields=id,name,email,picture&access_token={token}"
+        )
+        user_data = user_data.json()
+        user = User.query.filter_by(
+            email=user_data["email"],
+        ).first()
+        if not user:
+            user = User.create(
+                open_id=user_data["id"],
+                email=user_data["email"],
+                is_active=True,
+                username=user_data["email"],
+                provider=OpenidProviders.FACEBOOK,
+            )
+        login_user(user)
+        log(log.INFO, "User logged in\n.Profile:[%s]", user_data)
+    else:
+        flash(lazy_gettext("Error while logging in via Facebook"), "error")
+    return redirect(url_for("account.index"))
 
 @login_required
 def index():
@@ -55,6 +106,8 @@ def index():
 
 def login():
     """login page."""
+    if current_user.is_authenticated:
+        return redirect(url_for("account.index"))
     form = LoginForm(request.form)
     if form.validate_on_submit():
         login_user(form.user)
@@ -64,7 +117,19 @@ def login():
     else:
         log(log.ERROR, "Invalid data [%s]", form.errors)
         flash_errors(form)
-    return render_template("account/login.html", form=form)
+
+    return render_template(
+        "account/login.html",
+        form=form,
+        google_api_key=current_app.config["GOOGLE_API_KEY"],
+        google_client_id=current_app.config["GOOGLE_CLIENT_ID"],
+        facebook_app_id=current_app.config["FACEBOOK_APP_ID"],
+    )
+
+
+@login_manager.unauthorized_handler
+def unauthorized():
+    return render_template("errors/401.html"), 401
 
 
 def id_generator(size=8, chars=string.ascii_uppercase + string.digits):
@@ -206,7 +271,20 @@ def delete_address(id):
 @impl
 def flaskshop_load_blueprints(app):
     bp = Blueprint("account", __name__)
+    
+    google_bp = Blueprint("google", __name__)
+    facebook_bp = Blueprint("facebook", __name__)
+
+    google_bp.add_url_rule(
+        "/auth",
+        view_func=google_auth,
+        methods=["POST"],
+    )
+
+    facebook_bp.add_url_rule("/auth/", view_func=facebook_auth, methods=["GET", "POST"])
+
     bp.add_url_rule("/", view_func=index, methods=["GET", "POST"])
+
     bp.add_url_rule("/login", view_func=login, methods=["GET", "POST"])
     bp.add_url_rule("/resetpwd", view_func=resetpwd, methods=["GET", "POST"])
     bp.add_url_rule("/logout", view_func=logout)
@@ -221,3 +299,5 @@ def flaskshop_load_blueprints(app):
     )
 
     app.register_blueprint(bp, url_prefix="/account")
+    app.register_blueprint(google_bp, url_prefix="/google")
+    app.register_blueprint(facebook_bp, url_prefix="/facebook")
