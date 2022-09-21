@@ -29,16 +29,11 @@
     province -> country
     fix address save method
 
-# Stripe integration
 
 # Search
 
 # Translation
 
-# Set up migrations
-# ES PASSWORD + KIBANA
-# google account MUST be activated
-# If user loggined via oauth provider , there couldnt be "old_password" field
-# Fill up .env-sample
-
 # shop.simple2b.net - must work constantly using "develop" branch
+# FIX FACEBOOK LOGIN BUTTON 
+# Stripe integration

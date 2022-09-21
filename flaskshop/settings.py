@@ -95,7 +95,7 @@ class DevConfig(Config):
     MAIL_DEBUG = DEBUG_TB_ENABLED
     AUTHLIB_INSECURE_TRANSPORT = True
     SQLALCHEMY_DATABASE_URI = os.getenv(
-        "DB_URI",
+        "DB_URI_DEV",
         "sqlite:///" + str((Path(__file__).parent.parent / "database-test.sqlite3")),
     )
 
@@ -104,7 +104,7 @@ class ProdConfig(Config):
     ENV = "production"
     DEBUG = False
     DEBUG_TB_ENABLED = False
-    SQLALCHEMY_DATABASE_URI = os.getenv("DB_URI")
+    SQLALCHEMY_DATABASE_URI = os.getenv("DB_URI_PROD")
 
 
 config = {config_class.ENV: config_class for config_class in (DevConfig, ProdConfig)}

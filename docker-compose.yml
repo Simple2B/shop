@@ -42,6 +42,8 @@ services:
   web:
     build: .
     image: simple2b/flaskshop_simple2b
+    volumes:
+      - ${PWD}/.env:/app/.env
     env_file:
       - .env
     depends_on:
