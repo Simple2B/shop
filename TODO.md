@@ -34,3 +34,5 @@
 # Search
 
 # Translation
+
+# Fill up .env-sample

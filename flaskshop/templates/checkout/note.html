@@ -27,7 +27,7 @@
 {% endif %}
 
 <form method="post" novalidate>
-  {{ form.csrf_token }} {{ render_field(form.note) }}
+  {{ form.hidden_tag() }} {{ render_field(form.note) }}
   <p class="text-md-right">
     <button type="submit" class="btn btn-primary">ORDER & PAY</button>
   </p>

@@ -1,5 +1,6 @@
 from operator import or_
 from functools import reduce
+from uuid import uuid4
 
 from flask_login import UserMixin
 from libgravatar import Gravatar
@@ -10,19 +11,24 @@ from flaskshop.extensions import bcrypt
 from flaskshop.constant import Permission
 
 
+def gen_password_reset_id() -> str:
+    return str(uuid4())
+
+
 class User(Model, UserMixin):
     __tablename__ = "account_user"
     username = Column(db.String(80), unique=True, nullable=False, comment="user`s name")
     email = Column(db.String(80), unique=True, nullable=False)
     #: The hashed password
-    _password = db.Column(db.String, nullable=False)
+    _password = db.Column(db.String, nullable=True)
     nick_name = Column(db.String(255))
     is_active = Column(db.Boolean(), default=False)
     open_id = Column(db.String(80), index=True)
     session_key = Column(db.String(80), index=True)
+    reset_password_uid = db.Column(db.String(64), default=gen_password_reset_id)
 
-    def __init__(self, username, email, password, **kwargs):
-        super().__init__(username=username, email=email, password=password, **kwargs)
+    def __init__(self, username, email, **kwargs):
+        super().__init__(username=username, email=email, **kwargs)
 
     def __str__(self):
         return self.username

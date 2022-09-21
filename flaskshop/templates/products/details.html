@@ -14,9 +14,7 @@
   </li>
   {% if product.category %}
   <li>
-    <a href="{{ product.category.get_absolute_url() }}"
-      >{{ product.category }}</a
-    >
+    <a href="{{ product.category.get_absolute_url() }}">{{ product.category }}</a>
   </li>
   {% endif %}
   <li>
@@ -35,59 +33,26 @@
         <!-- prettier-ignore -->
         {% for image in images %}
         <div class="carousel-item{% if loop.first %} active{% endif %}">
-          <img
-            class="d-block img-fluid lazyload lazypreload"
-            alt=""
-            src="{{ image }}"
-            data-src="{{ image }}"
-            width="255"
-          />
+          <img class="d-block img-fluid lazyload lazypreload" alt="" src="{{ image }}" data-src="{{ image }}"
+            width="255" />
         </div>
         {% endfor %}
       </div>
       {% if images|length > 1 %}
-      <a
-        class="carousel-control-prev"
-        href="#carousel-example-generic"
-        role="button"
-        data-slide="prev"
-      >
-        <svg
-          data-src="{{ url_for('static', filename='img/gallery-arrow.svg') }}"
-        ></svg>
+      <a class="carousel-control-prev" href="#carousel-example-generic" role="button" data-slide="prev">
+        <svg data-src="{{ url_for('static', filename='img/gallery-arrow.svg') }}"></svg>
       </a>
-      <a
-        class="carousel-control-next"
-        href="#carousel-example-generic"
-        role="button"
-        data-slide="next"
-      >
-        <svg
-          data-src="{{ url_for('static', filename='img/gallery-arrow.svg') }}"
-        ></svg>
+      <a class="carousel-control-next" href="#carousel-example-generic" role="button" data-slide="next">
+        <svg data-src="{{ url_for('static', filename='img/gallery-arrow.svg') }}"></svg>
       </a>
       {% endif %}
       <ol class="carousel-indicators d-none d-md-block">
         <!-- prettier-ignore -->
         {% for image in images %}
         {% if images|length > 1 %}
-        <li
-          data-target="#carousel-example-generic"
-          data-slide-to="{{ loop.index - 1 }}"
-          {%
-          if
-          loop.first
-          %}
-          class="active"
-          {%
-          endif
-          %}
-        >
-          <img
-            class="lazyload lazypreload"
-            src="{{ image }}"
-            data-src="{{ image }}"
-          />
+        <li data-target="#carousel-example-generic" data-slide-to="{{ loop.index - 1 }}" {% if loop.first %}
+          class="active" {% endif %}>
+          <img class="lazyload lazypreload" src="{{ image }}" data-src="{{ image }}" />
         </li>
         <!-- prettier-ignore -->
         {% endif %}
@@ -114,14 +79,9 @@
     <!-- prettier-ignore -->
     {% if product.on_sale %}
     {% block orderform %}
-    <form
-      id="product-form"
-      role="form"
-      class="product-form1 clearfix"
-      method="post"
-      action="{{ url_for('product.product_add_to_cart', id=product.id) }}"
-    >
-      {{ form.csrf_token }}
+    <form id="product-form" role="form" class="product-form1 clearfix" method="post"
+      action="{{ url_for('product.product_add_to_cart', id=product.id) }}">
+      {{ form.hidden_tag() }}
       <!-- prettier-ignore -->
       {% if form.variant.choices | length > 1 %}
       <div class="variant-picker">
@@ -145,10 +105,7 @@
       <!-- prettier-ignore -->
       {% else %}
       {% for item in form.variant -%}
-      <label
-        class="btn btn-secondary variant-picker__option active"
-        style="display: none"
-      >
+      <label class="btn btn-secondary variant-picker__option active" style="display: none">
         {{ item(checked='checked')|safe }}
       </label>
       <!-- prettier-ignore -->
