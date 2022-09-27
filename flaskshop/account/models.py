@@ -1,12 +1,11 @@
 from operator import or_
 from functools import reduce
-import enum
 from uuid import uuid4
 from libgravatar import Gravatar
 
 from flask_login import UserMixin
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.types import Enum
+
 
 from flaskshop.database import Column, Model, db
 from flaskshop.extensions import bcrypt

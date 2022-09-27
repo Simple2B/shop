@@ -11,7 +11,6 @@ from flask import (
     current_app,
     url_for,
     abort,
-    jsonify,
     Response,
 )
 from flask_login import login_required, current_user
@@ -19,7 +18,6 @@ from pluggy import HookimplMarker
 import stripe
 
 from .models import Order, OrderPayment, OrderLine
-from .payment import zhifubao
 from flaskshop.extensions import csrf_protect
 from flaskshop.constant import ShipStatusKinds, PaymentStatusKinds, OrderStatusKinds
 
@@ -74,7 +72,7 @@ def stripe_pay():
     order = Order.query.filter_by(token=request.json["token"]).first()
     orderline = OrderLine.query.filter_by(order_id=order.id)
 
-    payment = create_payment(order.token, "stripe")
+    create_payment(order.token, "stripe")
 
     product_names = []
 
@@ -121,7 +119,7 @@ def stripe_payment_webhook():
 
         try:
             event = stripe.Event.construct_from(json.loads(payload), stripe.api_key)
-        except ValueError as e:
+        except ValueError:
             return Response(status=400)
 
         if event.type == "payment_intent.succeeded":
