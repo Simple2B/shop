@@ -12,8 +12,8 @@
       {% for address in current_user.addresses %}
       <div class="radio address_hide">
         <label>
-          <input type="radio" name="address_sel" value="{{ address.id }}" id="address_{{ address.id }}"
-            {% if loop.first %}checked{%endif%}>
+          <input type="radio" name="address_sel" value="{{ address.id }}" id="address_{{ address.id }}" {% if loop.first
+            %}checked{%endif%}>
           <div class="address-details">
             {{ macros.format_address(address) }}
           </div>
@@ -45,8 +45,8 @@
       {% for method in shipping_methods %}
       <div class="radio col-6 float-left">
         <label>
-          <input type="radio" name="shipping_method" value="{{ method.id }}" id="shipping_{{ method.id }}"
-            {% if loop.first %}checked{%endif%}>
+          <input type="radio" name="shipping_method" value="{{ method.id }}" id="shipping_{{ method.id }}" {% if
+            loop.first %}checked{%endif%}>
           <div class="address-details">
             {{ method }}
           </div>
@@ -61,4 +61,18 @@
     </button>
   </p>
 </form>
+<script>
+  const btnSubmit = document.querySelector('[type=submit]');
+  const radioBtns = document.querySelectorAll('input[name=address_sel]');
+  let checkedRadioBtns = document.querySelectorAll('input[name=address_sel]:checked');
+
+  if (!checkedRadioBtns.length) {
+    btnSubmit.disabled = true;
+    radioBtns.forEach((el) => {
+      el.addEventListener('click', () => {
+        btnSubmit.removeAttribute("disabled");
+      });
+    });
+  }
+</script>
 {% endblock %}
