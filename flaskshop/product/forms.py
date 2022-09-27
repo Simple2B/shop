@@ -13,7 +13,10 @@ class MyIntegerField(IntegerField):
 
 
 class AddCartForm(FlaskForm):
-    variant = RadioField("variant", validators=[DataRequired()], coerce=int)
+    variant = RadioField(
+        "variant",
+        coerce=int,
+    )
     quantity = MyIntegerField(
         "quantity", validators=[DataRequired(), NumberRange(min=1)], default=1
     )
