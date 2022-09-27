@@ -4,7 +4,6 @@ import unicodedata
 from uuid import uuid4
 import os
 
-from decimal import Decimal
 from faker import Factory
 from faker.providers import BaseProvider
 from sqlalchemy.sql.expression import func
@@ -42,7 +41,7 @@ fake = Factory.create()
 
 class SaleorProvider(BaseProvider):
     def money(self):
-        return fake.pydecimal(2, 2, positive=True)
+        return fake.pyfloat(2, 2, positive=True)
 
     def shipping_method(self):
         return random.choice(ShippingMethod.query.all())
@@ -167,7 +166,7 @@ def get_price_override(schema, combinations_num, current_price):
     if schema.get("different_variant_prices"):
         prices = sorted(
             [
-                round(Decimal(current_price) + fake.pydecimal(2, 2, positive=True), 2)
+                round((current_price) + fake.pyfloat(2, 2, positive=True), 2)
                 for _ in range(combinations_num)
             ],
             reverse=True,
@@ -308,7 +307,7 @@ def create_product(**kwargs):
     description = fake.paragraphs(5)
     defaults = {
         "title": fake.company(),
-        "basic_price": fake.pydecimal(2, 2, positive=True),
+        "basic_price": fake.pyfloat(2, 2, positive=True),
         "description": "\n\n".join(description),
         "is_featured": random.choice([0, 1]),
     }

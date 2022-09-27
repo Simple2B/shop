@@ -26,6 +26,12 @@ class Config:
     GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
     FACEBOOK_APP_ID = os.getenv("FACEBOOK_APP_ID")
 
+    # STRIPE
+    STRIPE_PUBLISHABLE_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY")
+    STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
+
+    BASE_WEBSITE_URL = os.getenv("BASE_WEBSITE_URL", "https://dev-shop.simple2b.net/")
+
     # Elasticsearch
     # if elasticsearch is enabled, the home page will have a search bar
     # and while add a product, the search index will get update
@@ -72,6 +78,12 @@ class Config:
     GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
     GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
     FACEBOOK_APP_ID = os.getenv("FACEBOOK_APP_ID")
+
+    @classmethod
+    def configure(cls, app):
+        import stripe
+
+        stripe.api_key = cls.STRIPE_SECRET_KEY
 
 
 class TestConfig(Config):

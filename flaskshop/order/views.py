@@ -1,5 +1,7 @@
 import time
 from datetime import datetime
+import json
+
 from flask_babel import lazy_gettext
 from flask import (
     Blueprint,
@@ -9,11 +11,13 @@ from flask import (
     current_app,
     url_for,
     abort,
+    jsonify,
 )
 from flask_login import login_required, current_user
 from pluggy import HookimplMarker
+import stripe
 
-from .models import Order, OrderPayment
+from .models import Order, OrderPayment, OrderLine
 from .payment import zhifubao
 from flaskshop.extensions import csrf_protect
 from flaskshop.constant import ShipStatusKinds, PaymentStatusKinds, OrderStatusKinds
@@ -31,7 +35,39 @@ def show(token):
     order = Order.query.filter_by(token=token).first()
     if not order.is_self_order:
         abort(403, lazy_gettext("This is not your order!"))
-    return render_template("orders/details.html", order=order)
+    return render_template(
+        "orders/details.html",
+        order=order,
+        stripe_publishable_key=current_app.config["STRIPE_PUBLISHABLE_KEY"],
+    )
+
+
+# def create_payment(token, payment_method):
+#     order = Order.query.filter_by(token=token).first()
+#     if order.status != OrderStatusKinds.unfulfilled.value:
+#         abort(403, lazy_gettext("This Order Can Not Pay"))
+#     payment_no = str(int(time.time())) + str(current_user.id)
+#     customer_ip_address = request.headers.get("X-Forwarded-For", request.remote_addr)
+#     payment = OrderPayment.query.filter_by(order_id=order.id).first()
+#     if payment:
+#         payment.update(
+#             payment_method=payment_method,
+#             payment_no=payment_no,
+#             customer_ip_address=customer_ip_address,
+#         )
+#     else:
+#         payment = OrderPayment.create(
+#             order_id=order.id,
+#             payment_method=payment_method,
+#             payment_no=payment_no,
+#             status=PaymentStatusKinds.waiting.value,
+#             total=order.total,
+#             customer_ip_address=customer_ip_address,
+#         )
+#     if payment_method == "alipay":
+#         order_string = zhifubao.send_order(order.token, payment_no, order.total)
+#         payment.order_string = order_string
+#     return payment
 
 
 def create_payment(token, payment_method):
@@ -43,42 +79,63 @@ def create_payment(token, payment_method):
     payment = OrderPayment.query.filter_by(order_id=order.id).first()
     if payment:
         payment.update(
-            payment_method=payment_method,
             payment_no=payment_no,
+            payment_method=payment_method,
             customer_ip_address=customer_ip_address,
+            status=PaymentStatusKinds.waiting.value,
         )
     else:
         payment = OrderPayment.create(
             order_id=order.id,
             payment_method=payment_method,
             payment_no=payment_no,
-            status=PaymentStatusKinds.waiting.value,
             total=order.total,
             customer_ip_address=customer_ip_address,
+            status=PaymentStatusKinds.waiting.value,
         )
-    if payment_method == "alipay":
-        order_string = zhifubao.send_order(order.token, payment_no, order.total)
-        payment.order_string = order_string
     return payment
 
 
-@login_required
-def ali_pay(token):
-    payment = create_payment(token, "alipay")
-    return redirect(current_app.config["PURCHASE_URI"] + payment.order_string)
+@csrf_protect.exempt
+def stripe_pay():
+    order = Order.query.filter_by(token=request.json["token"]).first()
+    orderline = OrderLine.query.filter_by(order_id=order.id)
+
+    payment = create_payment(order.token, "stripe")
+
+    product_names = []
+
+    for line in orderline:
+        product_names.append(line.product_name)
+
+    if not order:
+        return abort(404)
+
+    session = stripe.checkout.Session.create(
+        payment_method_types=["card"],
+        customer_email=current_user.email,
+        line_items=[
+            {
+                "name": ",".join(map(str, product_names)),
+                # "description": "Comfortable cotton t-shirt",
+                # "images": ["https://example.com/t-shirt.png"],
+                "amount": int(order.total * 100),
+                "currency": "usd",
+                "quantity": 1,
+            }
+        ],
+        mode="payment",
+        success_url=current_app.config["BASE_WEBSITE_URL"]
+        + url_for("order.payment_success"),
+        cancel_url=current_app.config["BASE_WEBSITE_URL"]
+        + url_for("order.payment_error"),
+    )
+    return {"session": session}
 
 
 @csrf_protect.exempt
-def ali_notify():
-    data = request.form.to_dict()
-    signature = data.pop("sign")
-    success = zhifubao.verify_order(data, signature)
-    if success:
-        order_payment = OrderPayment.query.filter_by(
-            payment_no=data["out_trade_no"]
-        ).first()
-        order_payment.pay_success(paid_at=data["gmt_payment"])
-    return "", 200
+def stripe_payment_webhook():
+    print("This is a webhook\n Here we gonna update order and orderpayment status")
 
 
 # for test pay flow
@@ -92,6 +149,11 @@ def test_pay(token):
 @login_required
 def payment_success():
     return render_template("orders/checkout_success.html")
+
+
+@login_required
+def payment_error():
+    return render_template("orders/checkout_error.html")
 
 
 @login_required
@@ -118,10 +180,18 @@ def flaskshop_load_blueprints(app):
     bp = Blueprint("order", __name__)
     bp.add_url_rule("/", view_func=index)
     bp.add_url_rule("/<string:token>", view_func=show)
-    bp.add_url_rule("/pay/<string:token>/alipay", view_func=ali_pay)
-    bp.add_url_rule("/alipay/notify", view_func=ali_notify, methods=["POST"])
+    # bp.add_url_rule("/pay/<string:token>/alipay", view_func=ali_pay)
+    bp.add_url_rule("/pay/stripe", view_func=stripe_pay, methods=["POST"])
+    bp.add_url_rule(
+        "/pay/stripe/webhook", view_func=stripe_payment_webhook, methods=["POST"]
+    )
+    # bp.add_url_rule("/alipay/notify", view_func=ali_notify, methods=["POST"])
     bp.add_url_rule("/pay/<string:token>/testpay", view_func=test_pay)
-    bp.add_url_rule("/payment_success", view_func=payment_success)
+
+    bp.add_url_rule("/payment/success", view_func=payment_success)
+    bp.add_url_rule("/payment/error", view_func=payment_error)
+
     bp.add_url_rule("/cancel/<string:token>", view_func=cancel_order)
     bp.add_url_rule("/receive/<string:token>", view_func=receive)
+
     app.register_blueprint(bp, url_prefix="/orders")

@@ -129,7 +129,7 @@ class Order(Model):
 
     @property
     def total(self):
-        return self.total_net + self.shipping_price_net - self.discount_amount
+        return round(self.total_net + self.shipping_price_net - self.discount_amount, 2)
 
     @property
     def status_human(self):
@@ -246,21 +246,23 @@ class Order(Model):
 
 class OrderLine(Model):
     __tablename__ = "order_line"
+
+    order_id = Column(db.Integer())
+    variant_id = Column(db.Integer())
+    product_id = Column(db.Integer())
+
     product_name = Column(db.String(256))
     product_sku = Column(db.String(128))
     quantity = Column(db.Integer())
     unit_price_net = Column(db.Float)
     is_shipping_required = Column(db.Boolean(), default=True)
-    order_id = Column(db.Integer())
-    variant_id = Column(db.Integer())
-    product_id = Column(db.Integer())
 
     @property
     def variant(self):
         return ProductVariant.get_by_id(self.variant_id)
 
     def get_total(self):
-        return self.unit_price_net * self.quantity
+        return float(self.unit_price_net * self.quantity)
 
 
 class OrderNote(Model):

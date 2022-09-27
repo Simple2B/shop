@@ -47,6 +47,7 @@ migrate = Migrate()
 def create_app(config_object=Config):
     app = Flask(__name__.split(".")[0])
     app.config.from_object(config_object)
+    config_object.configure(app)
     app.pluggy = manager.FlaskshopPluginManager("flaskshop")
     register_extensions(app)
     load_plugins(app)

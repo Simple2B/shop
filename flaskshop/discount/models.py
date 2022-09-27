@@ -1,7 +1,6 @@
 import random
 import string
 from datetime import datetime
-from decimal import Decimal
 
 # flake8: noqa 401
 from flaskshop.corelib.mc import cache, rdb
@@ -23,7 +22,7 @@ class Voucher(Model):
     start_date = Column(db.Date())
     end_date = Column(db.Date())
     discount_value_type = Column(db.Integer())
-    discount_value = Column(db.DECIMAL(10, 2))
+    discount_value = Column(db.Float)
     limit = Column(db.Float)
     category_id = Column(db.Integer())
     product_id = Column(db.Integer())
@@ -123,7 +122,7 @@ class Voucher(Model):
             return self.discount_value if price > self.discount_value else price
         elif self.discount_value_type == DiscountValueTypeKinds.percent.value:
             price = price * self.discount_value / 100
-            return Decimal(price).quantize(Decimal("0.00"))
+            return round(float(price), 2)
 
 
 class Sale(Model):
@@ -155,7 +154,7 @@ class Sale(Model):
             return sale.discount_value
         elif sale.discount_value_type == DiscountValueTypeKinds.percent.value:
             price = round((product.basic_price) * sale.discount_value / 100, 2)
-            return Decimal(price).quantize(Decimal("0.00"))
+            return round(float(price), 2)
 
     @property
     def categories(self):
