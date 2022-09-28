@@ -2,6 +2,7 @@ import itertools
 
 from flask import url_for, request, current_app
 from sqlalchemy.ext.mutable import MutableDict
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy import desc
 
 from flaskshop.database import Column, Model, db
@@ -31,7 +32,7 @@ class Product(Model):
     category_id = Column(db.Integer())
     is_featured = Column(db.Boolean(), default=False)
     product_type_id = Column(db.Integer())
-    attributes = Column(MutableDict.as_mutable(db.JSON()))
+    attributes = Column(MutableDict.as_mutable(JSONB))
     description = Column(db.Text())
     if Config.USE_REDIS:
         description = PropsItem("description")
@@ -746,9 +747,9 @@ def get_product_list_context(query, obj):
     price_from = request.args.get("price_from", None, type=int)
     price_to = request.args.get("price_to", None, type=int)
     if price_from:
-        query = query.filter(Product.basic_price > price_from)
+        query = query.filter(Product.basic_price >= price_from)
     if price_to:
-        query = query.filter(Product.basic_price < price_to)
+        query = query.filter(Product.basic_price <= price_to)
     args_dict.update(price_from=price_from, price_to=price_to)
 
     sort_by_choices = {"title": "title", "price": "price"}
@@ -774,7 +775,8 @@ def get_product_list_context(query, obj):
     for attr in attr_filter:
         value = request.args.get(attr.title)
         if value:
-            query = query.filter(Product.attributes.__getitem__(str(attr.id)) == value)
+            # query = query.filter(Product.attributes.__getitem__(str(attr.id)) == value)
+            query = query.filter(Product.attributes[str(attr.id)].astext == value)
             args_dict["default_attr"].update({attr.title: int(value)})
     args_dict.update(attr_filter=attr_filter)
 
