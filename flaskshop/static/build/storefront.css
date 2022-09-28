@@ -11481,6 +11481,11 @@ a.btn {
     background: #3b5998
 }
 
+
+.facebook-font-color {
+    color: white
+}
+
 .btn.social-btn.facebook:hover {
     background: #2d4373
 }
