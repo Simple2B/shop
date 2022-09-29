@@ -34,6 +34,8 @@ services:
         #   memory: 100m
     environment:
       discovery.type: single-node
+      # ELASTIC_USERNAME: ${ELASTIC_USERNAME}
+      # ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
     volumes:
       - es-data:/usr/share/elasticsearch/data
     ports:
