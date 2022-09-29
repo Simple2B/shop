@@ -17,6 +17,7 @@ from pluggy import HookimplMarker
 from flask_babel import lazy_gettext
 import requests
 
+
 from flaskshop.utils import flash_errors
 from .utils import message_sender_for_set_password
 from flaskshop.order.models import Order

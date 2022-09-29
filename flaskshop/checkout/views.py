@@ -1,8 +1,10 @@
+import os
+
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify, flash
 from flask_login import current_user, login_required
 from pluggy import HookimplMarker
 from flask_babel import lazy_gettext, format_currency
-import os
+
 
 from .models import CartLine, Cart, ShippingMethod
 from .forms import NoteForm, VoucherForm

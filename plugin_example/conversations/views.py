@@ -1,5 +1,6 @@
 import uuid
 from functools import wraps
+
 from flask_babel import lazy_gettext
 from flask import (
     Blueprint,

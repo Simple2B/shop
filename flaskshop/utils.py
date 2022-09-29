@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """Helper utilities and decorators."""
 
-import logging
 from logging.handlers import RotatingFileHandler
 from flask_sqlalchemy import get_debug_queries
 from flask import flash, request, current_app
@@ -12,6 +11,7 @@ from flaskshop.checkout.models import Cart
 from flaskshop.dashboard.models import Setting
 from flaskshop.plugin.utils import template_hook
 from flaskshop.constant import SiteDefaultSettings
+import logging
 
 
 def flash_errors(form, category="warning"):

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-"""Create an application instance."""
 from os import environ as env
 
 from flaskshop.app import create_app

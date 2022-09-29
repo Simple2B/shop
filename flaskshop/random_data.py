@@ -7,7 +7,6 @@ import os
 from faker import Factory
 from faker.providers import BaseProvider
 from sqlalchemy.sql.expression import func
-
 from flaskshop.product.models import (
     Category,
     ProductType,
