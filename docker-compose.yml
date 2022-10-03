@@ -34,8 +34,7 @@ services:
         #   memory: 100m
     environment:
       discovery.type: single-node
-      # ELASTIC_USERNAME: ${ELASTIC_USERNAME}
-      # ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      ELASTIC_PASSWORD: $ELASTIC_PASSWORD
     volumes:
       - es-data:/usr/share/elasticsearch/data
     ports:
@@ -56,7 +55,6 @@ services:
       - 127.0.0.1:${LOCAL_WEB_PORT:-5000}:5000
     environment:
       REDIS_URI: ${REDIS_URI}
-      ESEARCH_URI: ${ESEARCH_URI}
       FLASK_ENV: production
     restart: unless-stopped
 

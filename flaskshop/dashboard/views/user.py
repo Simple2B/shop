@@ -17,8 +17,8 @@ def users():
     if search_word:
         query = query.filter(
             or_(
-                User.username.like("%" + search_word + "%"),
-                User.email.like("%" + search_word + "%"),
+                User.username.ilike("%" + search_word + "%"),
+                User.email.ilike("%" + search_word + "%"),
             )
         )
     pagination = query.paginate(page, 10)

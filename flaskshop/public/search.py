@@ -1,14 +1,14 @@
 from elasticsearch_dsl import Boolean, Document, Integer, Float, Date, Text
-from elasticsearch_dsl.connections import connections
 from elasticsearch.helpers import parallel_bulk
 from elasticsearch.exceptions import NotFoundError, ConflictError
 from flask_sqlalchemy import Pagination
 
-from flaskshop.settings import Config
+# from flaskshop.settings import Config
 
-connections.create_connection(hosts=Config.ES_HOSTS, http_auth=None)
 
 SERACH_FIELDS = ["title^10", "description^5"]
+
+# WE NEED TO CREATE INDEX !!!
 
 
 def get_item_data(item):
