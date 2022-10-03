@@ -114,6 +114,8 @@ def register_commands(app):
     app.cli.add_command(commands.seed)
     app.cli.add_command(commands.flushrdb)
     app.cli.add_command(commands.reindex)
+    app.cli.add_command(commands.createsuperuser)
+    app.cli.add_command(commands.dropdb)
 
 
 def load_plugins(app):
