@@ -61,6 +61,7 @@ migrations/
 /.env
 .DS_Store
 /*.sqlite3
+/uploads
 
 # Log file
 build.log
