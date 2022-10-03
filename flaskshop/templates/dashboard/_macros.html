@@ -25,17 +25,17 @@
 
 
 {% macro render_select_field_role(role, has_zero=true) %}
-    <div class="form-group">
-        <label>{{ role.label.text }}</label>
-        <select class="form-control select2" style="width: 100%;" name="{{ role.label.text }}">
-            {% if has_zero %}
-                <option value="0">None</option>
-            {% endif %}
-            {% for item, data in role.choices %}
-                <option value="{{ item }}">{{ data }}</option>
-            {% endfor %}
-        </select>
-    </div>
+<div class="form-group">
+    <label>{{ role.label.text }}</label>
+    <select class="form-control select2" style="width: 100%;" name="{{ role.label.text }}">
+        {% if has_zero %}
+        <option value="0">None</option>
+        {% endif %}
+        {% for item, data in role.choices %}
+        <option value="{{ item }}">{{ data }}</option>
+        {% endfor %}
+    </select>
+</div>
 {% endmacro %}
 
 {% macro render_select_field(field, items, has_zero=true) %}
@@ -150,14 +150,16 @@
         <div class="img_block">
             <img class="" src="{{ subfield.data }}">
             <input type="hidden" name="{{subfield.label.field_id}}" value="{{ subfield.data.id }}">
-            <button type="button" class="btn btn-info btn-sm" id="item_del">Remove</button>
+            <button onclick="removeItem('{{ subfield.data.id }}')" type="button" class="btn btn-info btn-sm"
+                id="item_del">Remove</button>
         </div>
         {% endfor %}
     </div>
     <br />
     <div class="input-group">
         <div class="custom-file">
-            <input type="file" class="custom-file-input" id="exampleInputFile">
+            <input name="user_image" type="file" class="custom-file-input" accept="image/png, image/jpeg"
+                id="exampleInputFile">
             <label class="custom-file-label" for="exampleInputFile">Update New Image</label>
         </div>
         <div class="input-group-append">

@@ -18,6 +18,7 @@ from .views import (
     dashboard_menu_del,
     site_page_del,
     site_menu_del,
+    dashboard_product_delete_image,
 )
 
 
@@ -95,4 +96,10 @@ dashboard_api.add_url_rule(
 )
 dashboard_api.add_url_rule(
     "/site_menus/<int:id>/delete", view_func=site_menu_del, methods=["DELETE"]
+)
+
+dashboard_api.add_url_rule(
+    "/products/image/delete",
+    view_func=dashboard_product_delete_image,
+    methods=["DELETE"],
 )
