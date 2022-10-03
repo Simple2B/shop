@@ -1,4 +1,5 @@
 import itertools
+import uuid
 
 from flask import url_for, request, current_app
 from sqlalchemy.ext.mutable import MutableDict
@@ -115,22 +116,37 @@ class Product(Model):
         return cls.query.filter_by(is_featured=True).limit(num).all()
 
     def update_images(self, new_images):
-        origin_ids = (
-            ProductImage.query.with_entities(ProductImage.product_id)
-            .filter_by(product_id=self.id)
-            .all()
-        )
-        origin_ids = set(i for i, in origin_ids)
-        new_images = set(int(i) for i in new_images)
-        need_del = origin_ids - new_images
-        need_add = new_images - origin_ids
-        for id in need_del:
-            ProductImage.get_by_id(id).delete(commit=False)
-        for id in need_add:
-            image = ProductImage.get_by_id(id)
-            image.product_id = self.id
-            image.save(commit=False)
-        db.session.commit()
+        if request.files:
+            file = request.files["user_image"]
+            if file.filename:
+                unique_filename = f"{uuid.uuid4()}_{file.filename}"
+
+                # Saving file
+                save_path = current_app.config["UPLOAD_DIR"] / unique_filename
+                file.seek(0)
+                file.save(save_path)
+
+                filename = str(
+                    current_app.config["UPLOAD_FOLDER"] + "/" + unique_filename
+                )
+
+                ProductImage.create(image=filename, product_id=self.id)
+        # origin_ids = (
+        #     ProductImage.query.with_entities(ProductImage.product_id)
+        #     .filter_by(product_id=self.id)
+        #     .all()
+        # )
+        # origin_ids = set(i for i, in origin_ids)
+        # new_images = set(int(i) for i in new_images)
+        # need_del = origin_ids - new_images
+        # need_add = new_images - origin_ids
+        # for id in need_del:
+        #     ProductImage.get_by_id(id).delete(commit=False)
+        # for id in need_add:
+        #     image = ProductImage.get_by_id(id)
+        #     image.product_id = self.id
+        #     image.save(commit=False)
+        # db.session.commit()
 
     def update_attributes(self, attr_values):
         attr_entries = [str(item.id) for item in self.product_type.product_attributes]
