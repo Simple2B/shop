@@ -45,10 +45,9 @@ class Config:
     APP_DIR = Path(__file__).parent  # This directory
     PROJECT_ROOT = APP_DIR.parent
     STATIC_DIR = APP_DIR / "static"
-    UPLOAD_FOLDER = "upload"
+    UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER", "static/uploads")
     UPLOAD_DIR = STATIC_DIR / UPLOAD_FOLDER
     DASHBOARD_TEMPLATE_FOLDER = APP_DIR / "templates" / "dashboard"
-    UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER", "static/placeholders")
     PURCHASE_URI = os.getenv("PURCHASE_URI", "")
     BCRYPT_LOG_ROUNDS = 13
 
