@@ -201,7 +201,7 @@ def products():
         query = query.filter_by(category_id=category)
     title = request.args.get("title", type=str)
     if title:
-        query = query.filter(Product.title.like(f"%{title}%"))
+        query = query.filter(Product.title.ilike(f"%{title}%"))
     created_at = request.args.get("created_at", type=str)
     if created_at:
         start_date, end_date = created_at.split("-")

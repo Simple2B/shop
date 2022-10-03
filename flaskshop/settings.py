@@ -36,7 +36,7 @@ class Config:
     # if elasticsearch is enabled, the home page will have a search bar
     # and while add a product, the search index will get update
     USE_ES = int(os.getenv("USE_ES", 0)) == 1
-    ES_HOSTS = [os.getenv("ESEARCH_URI")]
+    # ES_HOSTS = [os.getenv("ESEARCH_URI")]
     # SQLALCHEMY
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     DATABASE_QUERY_TIMEOUT = 0.1  # log the slow database query, and unit is second
@@ -78,6 +78,8 @@ class Config:
     GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
     FACEBOOK_APP_ID = os.getenv("FACEBOOK_APP_ID")
 
+    ELASTIC_PASSWORD = os.getenv('ELASTIC_PASSWORD')
+
     @classmethod
     def configure(cls, app):
         import stripe
@@ -109,6 +111,7 @@ class DevConfig(Config):
         "DB_URI_DEV",
         "sqlite:///" + str((Path(__file__).parent.parent / "database-test.sqlite3")),
     )
+    ES_URI = os.getenv("ESEARCH_URI_DEV")
 
 
 class ProdConfig(Config):
@@ -116,6 +119,7 @@ class ProdConfig(Config):
     DEBUG = False
     DEBUG_TB_ENABLED = False
     SQLALCHEMY_DATABASE_URI = os.getenv("DB_URI_PROD")
+    ES_URI = os.getenv("ESEARCH_URI_PROD")
 
 
 config = {config_class.ENV: config_class for config_class in (DevConfig, ProdConfig)}

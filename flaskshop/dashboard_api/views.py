@@ -15,7 +15,6 @@ from flaskshop.product.models import (
 from flaskshop.discount.models import Sale, Voucher
 from flaskshop.dashboard.models import DashboardMenu
 from flaskshop.public.models import Page, MenuItem
-
 from .utils import ApiResult, wrap_partial
 
 
@@ -24,7 +23,8 @@ def item_del(cls, id):
         item = cls.get_by_id(id)
         item.delete()
     except Exception as e:
-        return ApiResult({"r": 1, "msg": str(e)})
+        print(e)
+        return ApiResult({"msg": str(e)})
     return ApiResult(dict())
 
 

@@ -15,7 +15,7 @@ def orders():
         query = query.filter_by(status=status)
     order_no = request.args.get("order_number", type=str)
     if order_no:
-        query = query.filter(Order.token.like(f"%{order_no}%"))
+        query = query.filter(Order.token.ilike(f"%{order_no}%"))
     created_at = request.args.get("created_at", type=str)
     if created_at:
         start_date, end_date = created_at.split("-")

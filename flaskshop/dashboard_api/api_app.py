@@ -1,3 +1,5 @@
+from os import environ as env
+
 from flaskshop.extensions import db, login_manager
 from flaskshop.account.utils import admin_required
 from flaskshop import settings
@@ -30,7 +32,9 @@ def create_app(config):
     return app
 
 
-dashboard_api = create_app(settings.Config)
+environment = env.get("FLASK_ENV", "development")
+conf = settings.config[environment]
+dashboard_api = create_app(conf)
 
 
 @dashboard_api.errorhandler(ApiException)

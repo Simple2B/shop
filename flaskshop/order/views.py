@@ -11,14 +11,13 @@ from flask import (
     current_app,
     url_for,
     abort,
-    jsonify,
+    Response,
 )
 from flask_login import login_required, current_user
 from pluggy import HookimplMarker
 import stripe
 
 from .models import Order, OrderPayment, OrderLine
-from .payment import zhifubao
 from flaskshop.extensions import csrf_protect
 from flaskshop.constant import ShipStatusKinds, PaymentStatusKinds, OrderStatusKinds
 
@@ -40,34 +39,6 @@ def show(token):
         order=order,
         stripe_publishable_key=current_app.config["STRIPE_PUBLISHABLE_KEY"],
     )
-
-
-# def create_payment(token, payment_method):
-#     order = Order.query.filter_by(token=token).first()
-#     if order.status != OrderStatusKinds.unfulfilled.value:
-#         abort(403, lazy_gettext("This Order Can Not Pay"))
-#     payment_no = str(int(time.time())) + str(current_user.id)
-#     customer_ip_address = request.headers.get("X-Forwarded-For", request.remote_addr)
-#     payment = OrderPayment.query.filter_by(order_id=order.id).first()
-#     if payment:
-#         payment.update(
-#             payment_method=payment_method,
-#             payment_no=payment_no,
-#             customer_ip_address=customer_ip_address,
-#         )
-#     else:
-#         payment = OrderPayment.create(
-#             order_id=order.id,
-#             payment_method=payment_method,
-#             payment_no=payment_no,
-#             status=PaymentStatusKinds.waiting.value,
-#             total=order.total,
-#             customer_ip_address=customer_ip_address,
-#         )
-#     if payment_method == "alipay":
-#         order_string = zhifubao.send_order(order.token, payment_no, order.total)
-#         payment.order_string = order_string
-#     return payment
 
 
 def create_payment(token, payment_method):
@@ -101,7 +72,7 @@ def stripe_pay():
     order = Order.query.filter_by(token=request.json["token"]).first()
     orderline = OrderLine.query.filter_by(order_id=order.id)
 
-    payment = create_payment(order.token, "stripe")
+    create_payment(order.token, "stripe")
 
     product_names = []
 
@@ -114,10 +85,13 @@ def stripe_pay():
     session = stripe.checkout.Session.create(
         payment_method_types=["card"],
         customer_email=current_user.email,
+        payment_intent_data={
+            "metadata": {"order_token": f"{order.token}"},
+            "receipt_email": current_user.email,
+        },
         line_items=[
             {
                 "name": ",".join(map(str, product_names)),
-                # "description": "Comfortable cotton t-shirt",
                 # "images": ["https://example.com/t-shirt.png"],
                 "amount": int(order.total * 100),
                 "currency": "usd",
@@ -135,7 +109,38 @@ def stripe_pay():
 
 @csrf_protect.exempt
 def stripe_payment_webhook():
-    print("This is a webhook\n Here we gonna update order and orderpayment status")
+    event = None
+    payload = request.data
+    payload_json = json.loads(payload)
+
+    order_token = payload_json["data"]["object"]["metadata"].get("order_token")
+    if order_token:
+        order = Order.query.filter_by(token=order_token).first()
+
+        try:
+            event = stripe.Event.construct_from(json.loads(payload), stripe.api_key)
+        except ValueError:
+            return Response(status=400)
+
+        if event.type == "payment_intent.succeeded":
+            order.update(
+                status=OrderStatusKinds.fulfilled.value,
+            )
+            order.payment.update(
+                status=PaymentStatusKinds.confirmed.value,
+            )
+
+        if (
+            event.type == "payment_intent.canceled"
+            and event.type == "payment_intent.payment_failed"
+        ):
+            order.update(
+                status=OrderStatusKinds.unfulfilled.value,
+            )
+            order.payment.update(
+                status=PaymentStatusKinds.rejected.value,
+            )
+    return Response(status=200)
 
 
 # for test pay flow
