@@ -2,6 +2,7 @@ from elasticsearch_dsl import Boolean, Document, Integer, Float, Date, Text
 from elasticsearch.helpers import parallel_bulk
 from elasticsearch.exceptions import NotFoundError, ConflictError
 from flask_sqlalchemy import Pagination
+from elasticsearch_dsl.connections import connections
 
 # from flaskshop.settings import Config
 

@@ -46,6 +46,7 @@ site_menu_del = wrap_partial(item_del, MenuItem)
 @csrf_protect.exempt
 def dashboard_product_delete_image():
     if request.method == "DELETE":
-        ProductImage.get_by_id()
+        img_id = request.json["imgId"]
+        ProductImage.get_by_id(img_id).delete()
         return dict(), 200
     return {"error": "error"}, 400

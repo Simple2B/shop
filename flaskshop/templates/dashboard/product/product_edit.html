@@ -49,16 +49,15 @@
 <script>
     function removeItem(imageId) {
         const imgId = { 'imgId': imageId }
-        fetch("{{ url_for('dashboard_api.dashboard_product_delete_image') }}", {
+        // TODO change url using url_for?
+        console.log("{{ url_for('dashboard_api.dashboard_product_delete_image') }}")
+        fetch("http://127.0.0.1:15051/dashboard_api/products/image/delete", {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(imgId)
         })
-            .then((response) => {
-                console.log(response);
-            })
     }
 </script>
 
