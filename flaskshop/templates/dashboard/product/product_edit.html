@@ -56,7 +56,42 @@
             },
             body: JSON.stringify(imgId)
         })
-    }
+    };
+
+
+    let imageFilesInput = document.getElementById('image-files-input');
+
+    imageFilesInput.addEventListener('input', function () {
+        const files = imageFilesInput.files
+        for (let i = 0; i < files.length; i++) {
+            let file = files[i];
+
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (e) => {
+
+                const image = new Image();
+                image.src = e.target.result;
+
+                image.onload = (e) => {
+
+                    const height = e.target.height;
+                    const width = e.target.width;
+
+                    if ((width > 1024 && height > 1024) || (width < 1000 && height < 1000)) {
+                        alert("The picture should have dimensions of 1000 by 1000\nPlease re-upload images with correct size");
+                        file = '';
+                        imageFilesInput.value = ''
+                    }
+                    else {
+                        return;
+                    }
+                };
+            }
+        }
+    })
+
+
 </script>
 
 {% endblock %}
