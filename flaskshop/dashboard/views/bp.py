@@ -46,6 +46,7 @@ from .product import (
     product_create_step1,
     product_create_step2,
     variant_manage,
+    dashboard_product_delete_image,
 )
 from .order import orders, order_detail, send_order, draft_order
 from .discount import vouchers, vouchers_manage, sales, sales_manage
@@ -229,5 +230,10 @@ def flaskshop_load_blueprints(app):
     bp.add_url_rule("/sales", view_func=sales)
     bp.add_url_rule("/sales/create", view_func=sales_manage, methods=["GET", "POST"])
     bp.add_url_rule("/sales/<id>/edit", view_func=sales_manage, methods=["GET", "POST"])
+    bp.add_url_rule(
+        "/products/image/delete",
+        view_func=dashboard_product_delete_image,
+        methods=["DELETE"],
+    )
     # bp.add_url_rule("/mails", view_func=mails)# TODO: e-mail to user, create mail template, send promotion and product
     app.register_blueprint(bp, url_prefix="/dashboard")

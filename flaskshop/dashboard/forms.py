@@ -150,7 +150,7 @@ class ProductTypeForm(FlaskForm):
 
 
 class ProductForm(FlaskForm):
-    title = StringField(lazy_gettext("Title"))
+    title = StringField(lazy_gettext("Title"), validators=[DataRequired()])
     basic_price = FloatField(lazy_gettext("Basic Price"))
     on_sale = BooleanField(lazy_gettext("On Sale"), default=True)
     is_featured = BooleanField(lazy_gettext("Is Featured"), default=False)
@@ -159,7 +159,7 @@ class ProductForm(FlaskForm):
     review_count = IntegerField(lazy_gettext("Review Count"), default=0)
     category_id = SelectField(lazy_gettext("Category"))
     description = TextAreaField(lazy_gettext("Description"))
-    images = FieldList(StringField(lazy_gettext("Images")))  # TODO Add max image count
+    images = FieldList(StringField(lazy_gettext("Images")))
     attributes = FieldList(SelectField(lazy_gettext("Atributes")))
     submit = SubmitField(lazy_gettext("Submit"))
 

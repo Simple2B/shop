@@ -45,8 +45,12 @@ class Config:
     APP_DIR = Path(__file__).parent  # This directory
     PROJECT_ROOT = APP_DIR.parent
     STATIC_DIR = APP_DIR / "static"
+
     UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER", "static/uploads")
     UPLOAD_DIR = STATIC_DIR / UPLOAD_FOLDER
+    if not os.path.exists(UPLOAD_DIR):
+        os.makedirs(UPLOAD_DIR)
+
     DASHBOARD_TEMPLATE_FOLDER = APP_DIR / "templates" / "dashboard"
     PURCHASE_URI = os.getenv("PURCHASE_URI", "")
     BCRYPT_LOG_ROUNDS = 13
@@ -78,7 +82,7 @@ class Config:
     GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
     FACEBOOK_APP_ID = os.getenv("FACEBOOK_APP_ID")
 
-    ELASTIC_PASSWORD = os.getenv('ELASTIC_PASSWORD')
+    ELASTIC_PASSWORD = os.getenv("ELASTIC_PASSWORD")
 
     @classmethod
     def configure(cls, app):

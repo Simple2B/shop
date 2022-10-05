@@ -43,9 +43,6 @@
 <div class="form-group">
     <label>{{ field.label.text }}</label>
     <select class="form-control select2" style="width: 100%;" name="{{ label_id }}">
-        {% if has_zero %}
-        <option value="0">None</option>
-        {% endif %}
         {% for item in items %}
         <option value="{{ item.id }}" {% if item.id==field.data|int %} selected {% endif %}>
             {{ item.title }}
@@ -147,10 +144,10 @@
     <label>{{ field.label.text }}</label>
     <div id="field_list" class="img_field">
         {% for subfield in field %}
-        <div class="img_block">
+        <div class="img_block rounded">
             <img class="" src="{{ subfield.data }}">
-            <input type="hidden" name="{{subfield.label.field_id}}" value="{{ subfield.data.id }}">
-            <button onclick="removeItem('{{ subfield.data.id }}')" type="button" class="btn btn-info btn-sm"
+            <input type="hidden" name="{{subfield.label.field_id}}" value="{{ subfield.data.id }}" multiple>
+            <button onclick="removeItem('{{ subfield.data.id }}')" type="button" class="btn btn-info btn-sm my-3"
                 id="item_del">Remove</button>
         </div>
         {% endfor %}
@@ -159,7 +156,7 @@
     <div class="input-group">
         <div class="custom-file">
             <input name="user_image" type="file" class="custom-file-input" accept="image/png, image/jpeg"
-                id="exampleInputFile">
+                id="image-files-input" multiple>
             <label class="custom-file-label" for="exampleInputFile">Update New Image</label>
         </div>
         <div class="input-group-append">

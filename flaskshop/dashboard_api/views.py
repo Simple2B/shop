@@ -1,7 +1,3 @@
-from flask import request
-from flask_login import login_required
-
-from flaskshop.extensions import csrf_protect
 from flaskshop.account.models import User
 from flaskshop.product.models import (
     ProductType,
@@ -10,7 +6,6 @@ from flaskshop.product.models import (
     ProductAttribute,
     Product,
     ProductVariant,
-    ProductImage,
 )
 from flaskshop.discount.models import Sale, Voucher
 from flaskshop.dashboard.models import DashboardMenu
@@ -40,13 +35,3 @@ product_type_del = wrap_partial(item_del, ProductType)
 dashboard_menu_del = wrap_partial(item_del, DashboardMenu)
 site_page_del = wrap_partial(item_del, Page)
 site_menu_del = wrap_partial(item_del, MenuItem)
-
-
-@login_required
-@csrf_protect.exempt
-def dashboard_product_delete_image():
-    if request.method == "DELETE":
-        img_id = request.json["imgId"]
-        ProductImage.get_by_id(img_id).delete()
-        return dict(), 200
-    return {"error": "error"}, 400

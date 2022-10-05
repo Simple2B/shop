@@ -49,9 +49,7 @@
 <script>
     function removeItem(imageId) {
         const imgId = { 'imgId': imageId }
-        // TODO change url using url_for?
-        console.log("{{ url_for('dashboard_api.dashboard_product_delete_image') }}")
-        fetch("http://127.0.0.1:15051/dashboard_api/products/image/delete", {
+        fetch("{{ url_for('dashboard.dashboard_product_delete_image') }}", {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',

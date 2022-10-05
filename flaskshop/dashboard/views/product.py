@@ -1,6 +1,8 @@
 from datetime import datetime
 
 from flask import request, render_template, redirect, url_for, current_app
+from flask_login import login_required
+from flaskshop.extensions import csrf_protect
 from flask_babel import lazy_gettext, gettext
 from flaskshop.product.models import (
     ProductAttribute,
@@ -9,6 +11,7 @@ from flaskshop.product.models import (
     Category,
     ProductType,
     ProductVariant,
+    ProductImage,
 )
 from flaskshop.dashboard.forms import (
     AttributeForm,
@@ -303,3 +306,13 @@ def variant_manage(id=None):
         variant.save()
         return redirect(url_for("dashboard.product_detail", id=variant.product_id))
     return render_template("product/variant.html", form=form)
+
+
+@login_required
+@csrf_protect.exempt
+def dashboard_product_delete_image():
+    if request.method == "DELETE":
+        img_id = request.json["imgId"]
+        ProductImage.get_by_id(img_id).delete()
+        return dict(), 200
+    return {"error": "error"}, 400
