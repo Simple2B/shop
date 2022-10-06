@@ -2,8 +2,9 @@ from datetime import datetime
 
 from flask import request, render_template, redirect, url_for, current_app
 from flask_login import login_required
-from flaskshop.extensions import csrf_protect
 from flask_babel import lazy_gettext, gettext
+
+from flaskshop.extensions import csrf_protect
 from flaskshop.product.models import (
     ProductAttribute,
     Collection,
@@ -24,9 +25,22 @@ from flaskshop.dashboard.forms import (
 )
 
 
+def generate_product_id():
+    import uuid
+
+    id_string = str(uuid.uuid4().int)
+    product_id = int(id_string[0:8])
+    return product_id
+
+
 def attributes():
     page = request.args.get("page", type=int, default=1)
-    pagination = ProductAttribute.query.paginate(page, 10)
+    query = ProductAttribute.query
+
+    title = request.args.get("title", type=str)
+    if title:
+        query = query.filter(ProductAttribute.title.ilike(f"%{title}%"))
+    pagination = query.paginate(page, 10)
     props = {
         "id": lazy_gettext("ID"),
         "title": lazy_gettext("Title"),
@@ -65,7 +79,11 @@ def attributes_manage(id=None):
 
 def collections():
     page = request.args.get("page", type=int, default=1)
-    pagination = Collection.query.paginate(page, 10)
+    query = Collection.query
+    title = request.args.get("title", type=str)
+    if title:
+        query = query = query.filter(Collection.title.ilike(f"%{title}%"))
+    pagination = query.paginate(page, 10)
     props = {
         "id": lazy_gettext("ID"),
         "title": lazy_gettext("Title"),
@@ -108,7 +126,14 @@ def collections_manage(id=None):
 
 def categories():
     page = request.args.get("page", type=int, default=1)
-    pagination = Category.query.paginate(page, 10)
+    query = Category.query
+
+    title = request.args.get("title", type=str)
+    if title:
+        query = query.filter(Category.title.ilike(f"%{title}%"))
+
+    pagination = query.paginate(page, 10)
+
     props = {
         "id": lazy_gettext("ID"),
         "title": lazy_gettext("Title"),
@@ -152,7 +177,11 @@ def categories_manage(id=None):
 
 def product_types():
     page = request.args.get("page", type=int, default=1)
-    pagination = ProductType.query.paginate(page, 10)
+    query = ProductAttribute.query
+    title = request.args.get("title", type=str)
+    if title:
+        query = query.filter(ProductAttribute.title.ilike(f"%{title}%"))
+    pagination = query.paginate(page, 10)
     props = {
         "id": lazy_gettext("ID"),
         "title": lazy_gettext("Title"),
@@ -196,8 +225,8 @@ def products():
     page = request.args.get("page", type=int, default=1)
     query = Product.query
 
-    on_sale = request.args.get("sale", type=int)
-    if on_sale is not None:
+    on_sale = request.args.get("sale", type=bool)
+    if on_sale:
         query = query.filter_by(on_sale=on_sale)
     category = request.args.get("category", type=int)
     if category:
@@ -277,7 +306,7 @@ def product_create_step2():
     product_type = ProductType.get_by_id(product_type_id)
     categories = Category.query.all()
     if form.validate_on_submit():
-        product = Product(product_type_id=product_type_id)
+        product = Product(id=generate_product_id(), product_type_id=product_type_id)
         product = _save_product(product, form)
         # product.generate_variants()
         return redirect(url_for("dashboard.product_detail", id=product.id))

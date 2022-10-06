@@ -12,7 +12,11 @@ from flask_babel import lazy_gettext
 
 def vouchers():
     page = request.args.get("page", type=int, default=1)
-    pagination = Voucher.query.paginate(page, 10)
+    query = Voucher.query
+    title = request.args.get("title", type=str)
+    if title:
+        query = query.filter(Voucher.title.ilike(f"%{title}%"))
+    pagination = query.paginate(page, 10)
     props = {
         "id": lazy_gettext("ID"),
         "title": lazy_gettext("Title"),
@@ -66,7 +70,12 @@ def vouchers_manage(id=None):
 
 def sales():
     page = request.args.get("page", type=int, default=1)
-    pagination = Sale.query.paginate(page, 10)
+    query = Sale.query
+
+    title = request.args.get("title", type=str)
+    if title:
+        query = query.filter(Sale.title.ilike(f"%{title}%"))
+    pagination = query.paginate(page, 10)
     props = {
         "id": lazy_gettext("ID"),
         "title": lazy_gettext("Title"),
