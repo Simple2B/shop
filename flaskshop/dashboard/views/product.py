@@ -1,4 +1,5 @@
 from datetime import datetime
+import random
 
 from flask import request, render_template, redirect, url_for, current_app
 from flask_login import login_required
@@ -66,6 +67,7 @@ def attributes_manage(id=None):
     if form.validate_on_submit():
         if not id:
             attr = ProductAttribute()
+        attr.id = int(random.randint(1, 100000))
         attr.title = form.title.data
         attr.update_types(form.types.data)
         attr.update_values(form.values.data)
@@ -177,10 +179,10 @@ def categories_manage(id=None):
 
 def product_types():
     page = request.args.get("page", type=int, default=1)
-    query = ProductAttribute.query
+    query = ProductType.query
     title = request.args.get("title", type=str)
     if title:
-        query = query.filter(ProductAttribute.title.ilike(f"%{title}%"))
+        query = query.filter(ProductType.title.ilike(f"%{title}%"))
     pagination = query.paginate(page, 10)
     props = {
         "id": lazy_gettext("ID"),
