@@ -10,6 +10,7 @@ from flaskshop.product.models import (
 from flaskshop.discount.models import Sale, Voucher
 from flaskshop.dashboard.models import DashboardMenu
 from flaskshop.public.models import Page, MenuItem
+from flaskshop.logger import log
 from .utils import ApiResult, wrap_partial
 
 
@@ -19,6 +20,7 @@ def item_del(cls, id):
         item.delete()
     except Exception as e:
         print(e)
+        (log.INFO, "Exception occured while deleting object from dashboard:\n[%s]", e)
         return ApiResult({"msg": str(e)})
     return ApiResult(dict())
 

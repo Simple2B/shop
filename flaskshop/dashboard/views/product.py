@@ -1,7 +1,7 @@
 from datetime import datetime
 import random
 
-from flask import request, render_template, redirect, url_for, current_app
+from flask import request, render_template, redirect, url_for, current_app, flash
 from flask_login import login_required
 from flask_babel import lazy_gettext, gettext
 
@@ -41,7 +41,7 @@ def attributes():
     title = request.args.get("title", type=str)
     if title:
         query = query.filter(ProductAttribute.title.ilike(f"%{title}%"))
-    pagination = query.paginate(page, 10)
+    pagination = query.paginate(page, current_app.config["PAGINATION_ITEMS_PER_PAGE"])
     props = {
         "id": lazy_gettext("ID"),
         "title": lazy_gettext("Title"),
@@ -85,7 +85,7 @@ def collections():
     title = request.args.get("title", type=str)
     if title:
         query = query = query.filter(Collection.title.ilike(f"%{title}%"))
-    pagination = query.paginate(page, 10)
+    pagination = query.paginate(page, current_app.config["PAGINATION_ITEMS_PER_PAGE"])
     props = {
         "id": lazy_gettext("ID"),
         "title": lazy_gettext("Title"),
@@ -134,7 +134,7 @@ def categories():
     if title:
         query = query.filter(Category.title.ilike(f"%{title}%"))
 
-    pagination = query.paginate(page, 10)
+    pagination = query.paginate(page, current_app.config["PAGINATION_ITEMS_PER_PAGE"])
 
     props = {
         "id": lazy_gettext("ID"),
@@ -183,7 +183,7 @@ def product_types():
     title = request.args.get("title", type=str)
     if title:
         query = query.filter(ProductType.title.ilike(f"%{title}%"))
-    pagination = query.paginate(page, 10)
+    pagination = query.paginate(page, current_app.config["PAGINATION_ITEMS_PER_PAGE"])
     props = {
         "id": lazy_gettext("ID"),
         "title": lazy_gettext("Title"),
@@ -243,7 +243,7 @@ def products():
         end_date = datetime.strptime(end_date.strip(), "%m/%d/%Y")
         query = query.filter(Product.created_at.between(start_date, end_date))
 
-    pagination = query.paginate(page, 10)
+    pagination = query.paginate(page, current_app.config["PAGINATION_ITEMS_PER_PAGE"])
     props = {
         "id": lazy_gettext("ID"),
         "title": lazy_gettext("Title"),
@@ -308,6 +308,15 @@ def product_create_step2():
     product_type = ProductType.get_by_id(product_type_id)
     categories = Category.query.all()
     if form.validate_on_submit():
+        category_id = int(request.form["category_id"])
+        if category_id == 0:
+            flash("Please, pick a category for your product", "danger")
+            return render_template(
+                "product/product_create_step2.html",
+                form=form,
+                product_type=product_type,
+                categories=categories,
+            )
         product = Product(id=generate_product_id(), product_type_id=product_type_id)
         product = _save_product(product, form)
         # product.generate_variants()

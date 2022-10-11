@@ -17,9 +17,11 @@ from flask_login import login_required, current_user
 from pluggy import HookimplMarker
 import stripe
 
+from flaskshop.product.models import Product
 from .models import Order, OrderPayment, OrderLine
 from flaskshop.extensions import csrf_protect
 from flaskshop.constant import ShipStatusKinds, PaymentStatusKinds, OrderStatusKinds
+from flaskshop.logger import log
 
 impl = HookimplMarker("flaskshop")
 
@@ -80,7 +82,11 @@ def stripe_pay():
         product_names.append(line.product_name)
 
     if not order:
+        log(log.INFO, "A user trying to get an order that does not exist")
         return abort(404)
+
+    # Getting image of first product for this order
+    first_product = Product.query.filter_by(id=orderline[0].product_id).first()
 
     session = stripe.checkout.Session.create(
         payment_method_types=["card"],
@@ -92,7 +98,9 @@ def stripe_pay():
         line_items=[
             {
                 "name": ",".join(map(str, product_names)),
-                # "images": ["https://example.com/t-shirt.png"],
+                "images": [
+                    first_product.first_img,
+                ],
                 "amount": int(order.total * 100),
                 "currency": "usd",
                 "quantity": 1,
@@ -190,7 +198,6 @@ def flaskshop_load_blueprints(app):
     bp.add_url_rule(
         "/pay/stripe/webhook", view_func=stripe_payment_webhook, methods=["POST"]
     )
-    # bp.add_url_rule("/alipay/notify", view_func=ali_notify, methods=["POST"])
     bp.add_url_rule("/pay/<string:token>/testpay", view_func=test_pay)
 
     bp.add_url_rule("/payment/success", view_func=payment_success)

@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, request, flash
+from flask import render_template, redirect, url_for, request, flash, current_app
 from flask_babel import lazy_gettext, gettext
 
 from flaskshop.public.models import MenuItem, Page
@@ -25,7 +25,7 @@ def shipping_methods():
     if title:
         query = query.filter(ShippingMethod.title.ilike(f"%{title}%"))
 
-    pagination = query.paginate(page, 10)
+    pagination = query.paginate(page, current_app.config["PAGINATION_ITEMS_PER_PAGE"])
     props = {
         "id": lazy_gettext("ID"),
         "title": lazy_gettext("Title"),
@@ -63,7 +63,7 @@ def site_menus():
     title = request.args.get("title", type=str)
     if title:
         query = query.filter(MenuItem.title.ilike(f"%{title}%"))
-    pagination = query.paginate(page, 10)
+    pagination = query.paginate(page, current_app.config["PAGINATION_ITEMS_PER_PAGE"])
     props = {
         "id": lazy_gettext("ID"),
         "title": lazy_gettext("Title"),
@@ -115,7 +115,7 @@ def dashboard_menus():
     title = request.args.get("title", type=str)
     if title:
         query = query.filter(DashboardMenu.title.ilike(f"%{title}%"))
-    pagination = query.paginate(page, 10)
+    pagination = query.paginate(page, current_app.config["PAGINATION_ITEMS_PER_PAGE"])
     props = {
         "id": lazy_gettext("ID"),
         "title": lazy_gettext("Title"),
@@ -157,7 +157,7 @@ def site_pages():
     title = request.args.get("title", type=str)
     if title:
         query = query.filter(Page.title.ilike(f"%{title}%"))
-    pagination = query.paginate(page, 10)
+    pagination = query.paginate(page, current_app.config["PAGINATION_ITEMS_PER_PAGE"])
     props = {
         "id": lazy_gettext("ID"),
         "title": lazy_gettext("Title"),

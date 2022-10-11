@@ -30,11 +30,11 @@ services:
       resources:
         limits:
           memory: 300m
-        # reservations:
-        #   memory: 100m
     environment:
+      node.name: flaskshop
+      cluster.name: flaskshop_cluster
       discovery.type: single-node
-      ELASTIC_PASSWORD: $ELASTIC_PASSWORD
+      ELASTIC_PASSWORD: "${ELASTIC_PASSWORD}"
     volumes:
       - es-data:/usr/share/elasticsearch/data
     ports:

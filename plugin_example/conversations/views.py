@@ -65,7 +65,7 @@ class Inbox(MethodView):
                 Conversation.trash == False,
             )
             .order_by(Conversation.updated_at.desc())
-            .paginate(page, 10, False)
+            .paginate(page, current_app.config["PAGINATION_ITEMS_PER_PAGE"], False)
         )
 
         return render_template("inbox.html", conversations=conversations)
@@ -240,7 +240,7 @@ class SentMessages(MethodView):
                 db.not_(Conversation.to_user_id == current_user.id),
             )
             .order_by(Conversation.updated_at.desc())
-            .paginate(page, 10, False)
+            .paginate(page, current_app.config["PAGINATION_ITEMS_PER_PAGE"], False)
         )
 
         return render_template("sent.html", conversations=conversations)
@@ -259,7 +259,7 @@ class TrashedMessages(MethodView):
                 Conversation.trash == True,
             )
             .order_by(Conversation.updated_at.desc())
-            .paginate(page, 10, False)
+            .paginate(page, current_app.config["PAGINATION_ITEMS_PER_PAGE"], False)
         )
 
         return render_template("trash.html", conversations=conversations)

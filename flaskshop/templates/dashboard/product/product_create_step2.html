@@ -41,7 +41,6 @@
 <script src="{{ url_for('static', filename='build/dashboard/product_edit.js') }}"></script>
 <script>
     let imageFilesInput = document.getElementById('image-files-input');
-
     imageFilesInput.addEventListener('input', function () {
         const files = imageFilesInput.files
         for (let i = 0; i < files.length; i++) {

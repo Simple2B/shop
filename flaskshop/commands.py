@@ -154,6 +154,7 @@ def createdb():
 @click.command()
 @with_appcontext
 def dropdb():
+    """Drops all database tables"""
     db.drop_all()
     click.echo("Drop db is done")
 
@@ -161,6 +162,7 @@ def dropdb():
 @click.command()
 @with_appcontext
 def createsuperuser():
+    """Creates superuser plus some extra users"""
     create_generator = chain(
         create_users(), create_roles(), create_admin(), create_dashboard_menus()
     )

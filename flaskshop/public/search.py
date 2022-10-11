@@ -7,7 +7,7 @@ from elasticsearch_dsl.connections import connections
 # from flaskshop.settings import Config
 
 
-SERACH_FIELDS = ["title^10", "description^5"]
+SEARCH_FIELDS = ["title^10", "description^5"]
 
 # WE NEED TO CREATE INDEX !!!
 
@@ -94,9 +94,10 @@ class Item(Document):
     @classmethod
     def new_search(cls, query, page, order_by=None, per_page=16):
         s = cls.search()
-        s = s.query("multi_match", query=query, fields=SERACH_FIELDS)
+        s = s.query("multi_match", query=query, fields=SEARCH_FIELDS)
         start = (page - 1) * per_page
         s = s.extra(**{"from": start, "size": per_page})
         s = s if order_by is None else s.sort(order_by)
         rs = s.execute()
-        return Pagination(query, page, per_page, rs.hits.total, rs)
+        items_total = rs.hits.total["value"]
+        return Pagination(query, page, per_page, items_total, rs)

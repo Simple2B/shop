@@ -1,5 +1,6 @@
 from datetime import datetime
-from flask import request, render_template
+
+from flask import request, render_template, current_app
 from flask_babel import lazy_gettext
 
 from flaskshop.order.models import Order
@@ -22,7 +23,7 @@ def orders():
         start_date = datetime.strptime(start_date.strip(), "%m/%d/%Y")
         end_date = datetime.strptime(end_date.strip(), "%m/%d/%Y")
         query = query.filter(Order.created_at.between(start_date, end_date))
-    pagination = query.paginate(page, 10)
+    pagination = query.paginate(page, current_app.config["PAGINATION_ITEMS_PER_PAGE"])
     props = {
         "id": lazy_gettext("ID"),
         "identity": lazy_gettext("Identity"),

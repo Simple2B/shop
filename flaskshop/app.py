@@ -60,7 +60,7 @@ def create_app(config_object=Config):
     app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {"/dashboard_api": dashboard_api})
     app.oauth = OAuth(app)
     app.mail = Mail(app)
-    connections.create_connection(
+    es_connection = connections.create_connection(
         hosts=[config_object.ES_URI],
         http_auth=("elastic", config_object.ELASTIC_PASSWORD),
     )

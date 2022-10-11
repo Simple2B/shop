@@ -1,6 +1,6 @@
 from flask_restplus import Namespace, Resource, fields
 from flask_login import current_user
-from flask import request
+from flask import request, current_app
 from flask_babel import lazy_gettext
 
 from flaskshop.product.models import Product
@@ -83,7 +83,9 @@ class ProductList(Resource):
     def get(self):
         """List all products"""
         page = request.args.get("page", 1, int)
-        products = Product.query.paginate(page, per_page=8).items
+        products = Product.query.paginate(
+            page, per_page=current_app.config["PAGINATION_ITEMS_PER_PAGE"]
+        ).items
         return products
 
 

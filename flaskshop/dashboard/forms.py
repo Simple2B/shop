@@ -151,7 +151,7 @@ class ProductTypeForm(FlaskForm):
 
 class ProductForm(FlaskForm):
     title = StringField(lazy_gettext("Title"), validators=[DataRequired()])
-    basic_price = FloatField(lazy_gettext("Basic Price"))
+    basic_price = FloatField(lazy_gettext("Basic Price"), validators=[DataRequired()])
     on_sale = BooleanField(lazy_gettext("On Sale"), default=True)
     is_featured = BooleanField(lazy_gettext("Is Featured"), default=False)
     rating = FloatField(lazy_gettext("Rating"), default=0)

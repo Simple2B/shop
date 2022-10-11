@@ -121,8 +121,6 @@
         </div>
         {% if order.status_human == "unfulfilled" %}
         <div class="col-6">
-            <span class="float-right">{% trans %}Please pay before 00:30, else the order will auto closed{% endtrans
-                %}</span>
             <!-- <a href="{{ url_for('order.stripe_pay', token=order.token) }}" class="btn btn-primary float-right"> -->
 
             <form id="stripe-form">

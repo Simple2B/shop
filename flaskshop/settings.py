@@ -84,6 +84,8 @@ class Config:
 
     ELASTIC_PASSWORD = os.getenv("ELASTIC_PASSWORD")
 
+    PAGINATION_ITEMS_PER_PAGE = int(os.getenv("PAGINATION_ITEMS_PER_PAGE", 10))
+
     @classmethod
     def configure(cls, app):
         import stripe
@@ -92,9 +94,12 @@ class Config:
 
 
 class TestConfig(Config):
+    ENV = "testing"
     SQLALCHEMY_DATABASE_URI = "sqlite:///" + str(
         (Path(__file__).parent.parent / "database-test.sqlite3")
     )
+    ES_URI = "FakePath"
+
     DEBUG = True
     WTF_CSRF_ENABLED = False
     DEBUG_TB_ENABLED = int(os.getenv("FLASK_DEBUG", 0)) == 1
@@ -126,4 +131,7 @@ class ProdConfig(Config):
     ES_URI = os.getenv("ESEARCH_URI_PROD")
 
 
-config = {config_class.ENV: config_class for config_class in (DevConfig, ProdConfig)}
+config = {
+    config_class.ENV: config_class
+    for config_class in (DevConfig, ProdConfig, TestConfig)
+}
