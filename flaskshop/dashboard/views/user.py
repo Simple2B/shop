@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, request, flash
+from flask import render_template, redirect, url_for, request, flash, current_app
 from sqlalchemy import or_
 from flask_babel import lazy_gettext
 
@@ -17,11 +17,11 @@ def users():
     if search_word:
         query = query.filter(
             or_(
-                User.username.like("%" + search_word + "%"),
-                User.email.like("%" + search_word + "%"),
+                User.username.ilike(f"%{search_word}%"),
+                User.email.ilike(f"%{search_word}%"),
             )
         )
-    pagination = query.paginate(page, 10)
+    pagination = query.paginate(page, current_app.config["PAGINATION_ITEMS_PER_PAGE"])
     props = {
         "id": lazy_gettext("ID"),
         "username": lazy_gettext("Username"),

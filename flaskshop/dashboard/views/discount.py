@@ -1,18 +1,21 @@
 from datetime import datetime
 
-from flask import request, render_template, redirect, url_for
+from flask import request, render_template, redirect, url_for, current_app
+from flask_babel import lazy_gettext
 
-# flake8: noqa 401
-from flaskshop.discount.models import Voucher, Sale, SaleCategory, SaleProduct
+from flaskshop.discount.models import Voucher, Sale
 from flaskshop.product.models import Product, Category
 from flaskshop.dashboard.forms import VoucherForm, SaleForm
 from flaskshop.constant import VoucherTypeKinds, DiscountValueTypeKinds
-from flask_babel import lazy_gettext
 
 
 def vouchers():
     page = request.args.get("page", type=int, default=1)
-    pagination = Voucher.query.paginate(page, 10)
+    query = Voucher.query
+    title = request.args.get("title", type=str)
+    if title:
+        query = query.filter(Voucher.title.ilike(f"%{title}%"))
+    pagination = query.paginate(page, current_app.config["PAGINATION_ITEMS_PER_PAGE"])
     props = {
         "id": lazy_gettext("ID"),
         "title": lazy_gettext("Title"),
@@ -66,7 +69,12 @@ def vouchers_manage(id=None):
 
 def sales():
     page = request.args.get("page", type=int, default=1)
-    pagination = Sale.query.paginate(page, 10)
+    query = Sale.query
+
+    title = request.args.get("title", type=str)
+    if title:
+        query = query.filter(Sale.title.ilike(f"%{title}%"))
+    pagination = query.paginate(page, current_app.config["PAGINATION_ITEMS_PER_PAGE"])
     props = {
         "id": lazy_gettext("ID"),
         "title": lazy_gettext("Title"),

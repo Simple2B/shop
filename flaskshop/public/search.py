@@ -1,14 +1,14 @@
 from elasticsearch_dsl import Boolean, Document, Integer, Float, Date, Text
-from elasticsearch_dsl.connections import connections
 from elasticsearch.helpers import parallel_bulk
-from elasticsearch.exceptions import NotFoundError, ConflictError
 from flask_sqlalchemy import Pagination
+from elasticsearch_dsl.connections import connections
 
-from flaskshop.settings import Config
+# from flaskshop.settings import Config
 
-connections.create_connection(hosts=Config.ES_HOSTS, http_auth=None)
 
-SERACH_FIELDS = ["title^10", "description^5"]
+SEARCH_FIELDS = ["title^10", "description^5"]
+
+# WE NEED TO CREATE INDEX !!!
 
 
 def get_item_data(item):
@@ -40,23 +40,16 @@ class Item(Document):
 
     @classmethod
     def add(cls, item):
-        obj = cls(**get_item_data(item))
+        obj = cls(meta={"id": item.id}, **get_item_data(item))
         obj.save()
         return obj
 
     @classmethod
     def update_item(cls, item):
-        try:
-            obj = cls.get(item.id)
-        except NotFoundError:
-            return cls.add(item)
+        obj = cls.get(item.id)
 
         kw = get_item_data(item)
-        try:
-            obj.update(**kw)
-        except ConflictError:
-            obj = cls.get(item.id)
-            obj.update(**kw)
+        obj.update(**kw)
         return True
 
     @classmethod
@@ -93,9 +86,10 @@ class Item(Document):
     @classmethod
     def new_search(cls, query, page, order_by=None, per_page=16):
         s = cls.search()
-        s = s.query("multi_match", query=query, fields=SERACH_FIELDS)
+        s = s.query("multi_match", query=query, fields=SEARCH_FIELDS)
         start = (page - 1) * per_page
         s = s.extra(**{"from": start, "size": per_page})
         s = s if order_by is None else s.sort(order_by)
         rs = s.execute()
-        return Pagination(query, page, per_page, rs.hits.total, rs)
+        items_total = rs.hits.total["value"]
+        return Pagination(query, page, per_page, items_total, rs)

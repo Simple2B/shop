@@ -1,7 +1,11 @@
 from datetime import datetime
+import random
 
-from flask import request, render_template, redirect, url_for, current_app
+from flask import request, render_template, redirect, url_for, current_app, flash
+from flask_login import login_required
 from flask_babel import lazy_gettext, gettext
+
+from flaskshop.extensions import csrf_protect
 from flaskshop.product.models import (
     ProductAttribute,
     Collection,
@@ -9,6 +13,7 @@ from flaskshop.product.models import (
     Category,
     ProductType,
     ProductVariant,
+    ProductImage,
 )
 from flaskshop.dashboard.forms import (
     AttributeForm,
@@ -21,9 +26,22 @@ from flaskshop.dashboard.forms import (
 )
 
 
+def generate_product_id():
+    import uuid
+
+    id_string = str(uuid.uuid4().int)
+    product_id = int(id_string[0:8])
+    return product_id
+
+
 def attributes():
     page = request.args.get("page", type=int, default=1)
-    pagination = ProductAttribute.query.paginate(page, 10)
+    query = ProductAttribute.query
+
+    title = request.args.get("title", type=str)
+    if title:
+        query = query.filter(ProductAttribute.title.ilike(f"%{title}%"))
+    pagination = query.paginate(page, current_app.config["PAGINATION_ITEMS_PER_PAGE"])
     props = {
         "id": lazy_gettext("ID"),
         "title": lazy_gettext("Title"),
@@ -49,6 +67,7 @@ def attributes_manage(id=None):
     if form.validate_on_submit():
         if not id:
             attr = ProductAttribute()
+        attr.id = int(random.randint(1, 100000))
         attr.title = form.title.data
         attr.update_types(form.types.data)
         attr.update_values(form.values.data)
@@ -62,7 +81,11 @@ def attributes_manage(id=None):
 
 def collections():
     page = request.args.get("page", type=int, default=1)
-    pagination = Collection.query.paginate(page, 10)
+    query = Collection.query
+    title = request.args.get("title", type=str)
+    if title:
+        query = query = query.filter(Collection.title.ilike(f"%{title}%"))
+    pagination = query.paginate(page, current_app.config["PAGINATION_ITEMS_PER_PAGE"])
     props = {
         "id": lazy_gettext("ID"),
         "title": lazy_gettext("Title"),
@@ -105,7 +128,14 @@ def collections_manage(id=None):
 
 def categories():
     page = request.args.get("page", type=int, default=1)
-    pagination = Category.query.paginate(page, 10)
+    query = Category.query
+
+    title = request.args.get("title", type=str)
+    if title:
+        query = query.filter(Category.title.ilike(f"%{title}%"))
+
+    pagination = query.paginate(page, current_app.config["PAGINATION_ITEMS_PER_PAGE"])
+
     props = {
         "id": lazy_gettext("ID"),
         "title": lazy_gettext("Title"),
@@ -149,7 +179,11 @@ def categories_manage(id=None):
 
 def product_types():
     page = request.args.get("page", type=int, default=1)
-    pagination = ProductType.query.paginate(page, 10)
+    query = ProductType.query
+    title = request.args.get("title", type=str)
+    if title:
+        query = query.filter(ProductType.title.ilike(f"%{title}%"))
+    pagination = query.paginate(page, current_app.config["PAGINATION_ITEMS_PER_PAGE"])
     props = {
         "id": lazy_gettext("ID"),
         "title": lazy_gettext("Title"),
@@ -193,15 +227,15 @@ def products():
     page = request.args.get("page", type=int, default=1)
     query = Product.query
 
-    on_sale = request.args.get("sale", type=int)
-    if on_sale is not None:
+    on_sale = request.args.get("sale", type=bool)
+    if on_sale:
         query = query.filter_by(on_sale=on_sale)
     category = request.args.get("category", type=int)
     if category:
         query = query.filter_by(category_id=category)
     title = request.args.get("title", type=str)
     if title:
-        query = query.filter(Product.title.like(f"%{title}%"))
+        query = query.filter(Product.title.ilike(f"%{title}%"))
     created_at = request.args.get("created_at", type=str)
     if created_at:
         start_date, end_date = created_at.split("-")
@@ -209,7 +243,7 @@ def products():
         end_date = datetime.strptime(end_date.strip(), "%m/%d/%Y")
         query = query.filter(Product.created_at.between(start_date, end_date))
 
-    pagination = query.paginate(page, 10)
+    pagination = query.paginate(page, current_app.config["PAGINATION_ITEMS_PER_PAGE"])
     props = {
         "id": lazy_gettext("ID"),
         "title": lazy_gettext("Title"),
@@ -274,7 +308,16 @@ def product_create_step2():
     product_type = ProductType.get_by_id(product_type_id)
     categories = Category.query.all()
     if form.validate_on_submit():
-        product = Product(product_type_id=product_type_id)
+        category_id = int(request.form["category_id"])
+        if category_id == 0:
+            flash("Please, pick a category for your product", "danger")
+            return render_template(
+                "product/product_create_step2.html",
+                form=form,
+                product_type=product_type,
+                categories=categories,
+            )
+        product = Product(id=generate_product_id(), product_type_id=product_type_id)
         product = _save_product(product, form)
         # product.generate_variants()
         return redirect(url_for("dashboard.product_detail", id=product.id))
@@ -303,3 +346,13 @@ def variant_manage(id=None):
         variant.save()
         return redirect(url_for("dashboard.product_detail", id=variant.product_id))
     return render_template("product/variant.html", form=form)
+
+
+@login_required
+@csrf_protect.exempt
+def dashboard_product_delete_image():
+    if request.method == "DELETE":
+        img_id = request.json["imgId"]
+        ProductImage.get_by_id(img_id).delete()
+        return dict(), 200
+    return {"error": "error"}, 400

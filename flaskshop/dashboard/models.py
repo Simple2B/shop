@@ -6,7 +6,7 @@ from flaskshop.constant import SettingValueType
 
 class DashboardMenu(Model):
     __tablename__ = "management_dashboard"
-    title = Column(db.String(256), nullable=False)
+    title = Column(db.String(256), nullable=False, unique=True)
     order = Column(db.Integer, default=0)
     endpoint = Column(db.String(256))
     icon_cls = Column(db.String(256))

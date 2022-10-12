@@ -32,7 +32,7 @@ def favicon():
 
 
 def search():
-    query = request.args.get("q", "")
+    query = request.args.get("q", default="", type=str)
     page = request.args.get("page", default=1, type=int)
     pagination = Item.new_search(query, page)
     return render_template(

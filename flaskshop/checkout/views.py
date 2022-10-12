@@ -1,8 +1,10 @@
+import os
+
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify, flash
 from flask_login import current_user, login_required
 from pluggy import HookimplMarker
 from flask_babel import lazy_gettext, format_currency
-import os
+
 
 from .models import CartLine, Cart, ShippingMethod
 from .forms import NoteForm, VoucherForm
@@ -50,7 +52,12 @@ def checkout_shipping():
     form = AddressForm(request.form)
     user_address = None
     if request.method == "POST":
-        if request.form["address_sel"] != "new":
+        if "address_sel" not in request.form:
+            flash(
+                'Please check the option "Enter a new address" and add a new address',
+                "warning",
+            )
+        elif request.form["address_sel"] != "new":
             user_address = UserAddress.get_by_id(request.form["address_sel"])
         elif request.form["address_sel"] == "new" and form.validate_on_submit():
             user_address = UserAddress.create(

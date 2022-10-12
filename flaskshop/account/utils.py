@@ -1,11 +1,11 @@
 from functools import wraps
 
-import phonenumbers
 from flask import abort, url_for, current_app, render_template
 from flask_login import current_user
 from flask_mail import Message
-from phonenumbers.phonenumberutil import is_possible_number
 from wtforms import ValidationError
+import phonenumbers
+from phonenumbers.phonenumberutil import is_possible_number
 
 from flaskshop.constant import Permission
 from .models import User

@@ -1,8 +1,9 @@
-from decimal import Decimal
 import itertools
+import uuid
 
 from flask import url_for, request, current_app
 from sqlalchemy.ext.mutable import MutableDict
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy import desc
 
 from flaskshop.database import Column, Model, db
@@ -32,7 +33,7 @@ class Product(Model):
     category_id = Column(db.Integer())
     is_featured = Column(db.Boolean(), default=False)
     product_type_id = Column(db.Integer())
-    attributes = Column(MutableDict.as_mutable(db.JSON()))
+    attributes = Column(MutableDict.as_mutable(JSONB))
     description = Column(db.Text())
     if Config.USE_REDIS:
         description = PropsItem("description")
@@ -85,7 +86,7 @@ class Product(Model):
     @property
     def price(self):
         if self.is_discounted:
-            return round(Decimal(self.basic_price) - self.discounted_price, 2)
+            return round(self.basic_price - self.discounted_price, 2)
         return self.basic_price
 
     @property
@@ -115,22 +116,22 @@ class Product(Model):
         return cls.query.filter_by(is_featured=True).limit(num).all()
 
     def update_images(self, new_images):
-        origin_ids = (
-            ProductImage.query.with_entities(ProductImage.product_id)
-            .filter_by(product_id=self.id)
-            .all()
-        )
-        origin_ids = set(i for i, in origin_ids)
-        new_images = set(int(i) for i in new_images)
-        need_del = origin_ids - new_images
-        need_add = new_images - origin_ids
-        for id in need_del:
-            ProductImage.get_by_id(id).delete(commit=False)
-        for id in need_add:
-            image = ProductImage.get_by_id(id)
-            image.product_id = self.id
-            image.save(commit=False)
-        db.session.commit()
+        if request.files:
+            files = request.files.getlist("user_image")
+            for file in files:
+                if file.filename:
+                    unique_filename = f"{uuid.uuid4()}_{file.filename}"
+
+                    # Saving file
+                    save_path = current_app.config["UPLOAD_DIR"] / unique_filename
+                    file.seek(0)
+                    file.save(save_path)
+
+                    filename = str(
+                        current_app.config["UPLOAD_FOLDER"] + "/" + unique_filename
+                    )
+
+                    ProductImage.create(image=filename, product_id=self.id)
 
     def update_attributes(self, attr_values):
         attr_entries = [str(item.id) for item in self.product_type.product_attributes]
@@ -216,7 +217,7 @@ class Product(Model):
 
 class Category(Model):
     __tablename__ = "product_category"
-    title = Column(db.String(256), nullable=False)
+    title = Column(db.String(256), nullable=False, unique=True)
     parent_id = Column(db.Integer(), default=0)
     background_img = Column(db.String(255))
 
@@ -259,7 +260,9 @@ class Category(Model):
         all_category_ids = [child.id for child in category.children] + [category.id]
         query = Product.query.filter(Product.category_id.in_(all_category_ids))
         ctx, query = get_product_list_context(query, category)
-        pagination = query.paginate(page, per_page=16)
+        pagination = query.paginate(
+            page, per_page=current_app.config["PAGINATION_ITEMS_PER_PAGE"]
+        )
         del pagination.query
         ctx.update(object=category, pagination=pagination, products=pagination.items)
         return ctx
@@ -302,7 +305,6 @@ class Category(Model):
 
 
 class ProductTypeAttributes(Model):
-    """存储的产品的属性是包括用户可选和不可选"""
 
     __tablename__ = "product_type_attribute"
     product_type_id = Column(db.Integer())
@@ -310,7 +312,6 @@ class ProductTypeAttributes(Model):
 
 
 class ProductTypeVariantAttributes(Model):
-    """存储的产品SKU的属性是可以给用户去选择的"""
 
     __tablename__ = "product_type_variant_attribute"
     product_type_id = Column(db.Integer())
@@ -318,8 +319,9 @@ class ProductTypeVariantAttributes(Model):
 
 
 class ProductType(Model):
+
     __tablename__ = "product_type"
-    title = Column(db.String(256), nullable=False)
+    title = Column(db.String(256), nullable=False, unique=True)
     has_variants = Column(db.Boolean(), default=True)
     is_shipping_required = Column(db.Boolean(), default=False)
 
@@ -498,7 +500,7 @@ class ProductVariant(Model):
 
 class ProductAttribute(Model):
     __tablename__ = "product_attribute"
-    title = Column(db.String(256), nullable=False)
+    title = Column(db.String(256), nullable=False, unique=True)
 
     def __str__(self):
         return self.title
@@ -636,7 +638,7 @@ class ProductImage(Model):
 
 class Collection(Model):
     __tablename__ = "product_collection"
-    title = Column(db.String(256), nullable=False)
+    title = Column(db.String(256), nullable=False, unique=True)
     background_img = Column(db.String(256))
 
     def __str__(self):
@@ -713,7 +715,9 @@ class ProductCollection(Model):
         )
         query = Product.query.filter(Product.id.in_(id for id, in at_ids))
         ctx, query = get_product_list_context(query, collection)
-        pagination = query.paginate(page, per_page=16)
+        pagination = query.paginate(
+            page, per_page=current_app.config["PAGINATION_ITEMS_PER_PAGE"]
+        )
         del pagination.query
         ctx.update(object=collection, pagination=pagination, products=pagination.items)
         return ctx
@@ -747,9 +751,9 @@ def get_product_list_context(query, obj):
     price_from = request.args.get("price_from", None, type=int)
     price_to = request.args.get("price_to", None, type=int)
     if price_from:
-        query = query.filter(Product.basic_price > price_from)
+        query = query.filter(Product.basic_price >= price_from)
     if price_to:
-        query = query.filter(Product.basic_price < price_to)
+        query = query.filter(Product.basic_price <= price_to)
     args_dict.update(price_from=price_from, price_to=price_to)
 
     sort_by_choices = {"title": "title", "price": "price"}
@@ -775,7 +779,8 @@ def get_product_list_context(query, obj):
     for attr in attr_filter:
         value = request.args.get(attr.title)
         if value:
-            query = query.filter(Product.attributes.__getitem__(str(attr.id)) == value)
+            # query = query.filter(Product.attributes.__getitem__(str(attr.id)) == value)
+            query = query.filter(Product.attributes[str(attr.id)].astext == value)
             args_dict["default_attr"].update({attr.title: int(value)})
     args_dict.update(attr_filter=attr_filter)
 

@@ -35,16 +35,17 @@
 <div class="row">
   <div class="col-sm-6 col-md-12 col-xl-6">
     <button class="btn social-btn google" id="authorize_button">
-      <svg data-src=" {{ url_for('static', filename='img/social/login/google.svg' ) }}" width="18" height="18" />
-      <small>Google</small>
+      <svg class="google-logo" data-src=" {{ url_for('static', filename='img/social/login/google.svg' ) }}" width="18" height="18" />
+      <small class="google-text">Google</small>
     </button>
   </div>
   <div class="col-sm-6 col-md-12 col-xl-6">
-    <button class="btn social-btn facebook">
+    <div class="facebook-btn">
       <div class="fb-login-button" scope="public_profile,email" onlogin="checkLoginState();"
-        data-button-type="login_with" data-layout="rounded" data-auto-logout-link="false" data-use-continue-as="false">
-        Login</div>
-    </button>
+        data-size="medium" data-button-type="login_with" data-layout="rounded" data-auto-logout-link="false" data-use-continue-as="false">
+        Facebook
+      </div>
+    </div>
 
     <div id="fb-root"></div>
 

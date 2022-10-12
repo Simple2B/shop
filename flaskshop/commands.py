@@ -152,6 +152,27 @@ def createdb():
 
 
 @click.command()
+@with_appcontext
+def dropdb():
+    """Drops all database tables"""
+    db.drop_all()
+    click.echo("Drop db is done")
+
+
+@click.command()
+@with_appcontext
+def createsuperuser():
+    """Creates superuser plus some extra users"""
+    create_generator = chain(
+        create_users(), create_roles(), create_admin(), create_dashboard_menus()
+    )
+    for msg in create_generator:
+        click.echo(msg)
+
+    click.echo("superuser is created")
+
+
+@click.command()
 @click.option("--type", default="default", help="which type to seed")
 @with_appcontext
 def seed(type):

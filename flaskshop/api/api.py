@@ -3,7 +3,6 @@ from flask_restplus import Api
 from pluggy import HookimplMarker
 
 from flaskshop.extensions import csrf_protect
-
 from .product import api as product_api
 from .checkout import api as checkout_api
 from .auth import api as auth_api

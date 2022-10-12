@@ -66,6 +66,7 @@
   <div class="col-md-6 col-12 product__info">
     <h1 class="product__info__name">{{ product }}</h1>
 
+
     <h2 class="product__info__price">
       <span class="text-info">$ {{product.price}}</span>
       {% if product.is_discounted %}
@@ -77,6 +78,12 @@
     </h2>
 
     <!-- prettier-ignore -->
+    {% if not product.variant %}
+    <p class="alert alert-warning">
+      {% trans %}There are no variants for this product{% endtrans %}
+    </p>
+
+    {% else %}
     {% if product.on_sale %}
     {% block orderform %}
     <form id="product-form" role="form" class="product-form1 clearfix" method="post"
@@ -150,5 +157,7 @@
       {% endfor %}
     </table>
   </div>
+
+  {% endif %}
 </div>
 {% endblock content %}

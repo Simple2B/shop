@@ -15,7 +15,7 @@
                     </div>
                     <!-- /.card-header -->
                     <!-- form start -->
-                    <form method="POST" action="">
+                    <form method="POST" action="" enctype="multipart/form-data">
                         <div class="card-body">
                             {{ form.hidden_tag() }}
                             <label>Type:</label> {{product.product_type}}
@@ -29,7 +29,8 @@
                             {{ macros.render_select_field(form.category_id, categories) }}
                             {{ vendor.render_field(form.description) }}
                             {{ macros.render_multi_img(form.images) }}
-                            {{ macros.render_attribute_field(form.attributes, product.product_type.product_attributes) }}
+                            {{ macros.render_attribute_field(form.attributes, product.product_type.product_attributes)
+                            }}
 
                             <div class="card-footer">
                                 {{ macros.render_submit(form.submit) }}
@@ -44,4 +45,53 @@
 
 {% block tail_js %}
 <script src="{{ url_for('static', filename='build/dashboard/product_edit.js') }}"></script>
+
+<script>
+    function removeItem(imageId) {
+        const imgId = { 'imgId': imageId }
+        fetch("{{ url_for('dashboard.dashboard_product_delete_image') }}", {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(imgId)
+        })
+    };
+
+
+    let imageFilesInput = document.getElementById('image-files-input');
+
+    imageFilesInput.addEventListener('input', function () {
+        const files = imageFilesInput.files
+        for (let i = 0; i < files.length; i++) {
+            let file = files[i];
+
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (e) => {
+
+                const image = new Image();
+                image.src = e.target.result;
+
+                image.onload = (e) => {
+
+                    const height = e.target.height;
+                    const width = e.target.width;
+
+                    if ((width > 1024 && height > 1024) || (width < 1000 && height < 1000)) {
+                        alert("The picture should have dimensions of 1000 by 1000\nPlease re-upload images with correct size");
+                        file = '';
+                        imageFilesInput.value = ''
+                    }
+                    else {
+                        return;
+                    }
+                };
+            }
+        }
+    })
+
+
+</script>
+
 {% endblock %}

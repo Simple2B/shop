@@ -20,11 +20,13 @@ class Cart(Model):
 
     @property
     def subtotal(self):
-        return sum(line.subtotal for line in self)
+        return round(sum(line.subtotal for line in self), 2)
 
     @property
     def total(self):
-        return self.subtotal + self.shipping_method_price - self.discount_amount
+        return round(
+            (self.subtotal) + (self.shipping_method_price) - self.discount_amount, 2
+        )
 
     @property
     def discount_amount(self):

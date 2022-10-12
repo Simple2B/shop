@@ -1,9 +1,9 @@
-from flask import render_template, redirect, url_for, request, flash
+from flask import render_template, redirect, url_for, request, flash, current_app
 from flask_babel import lazy_gettext, gettext
 
 from flaskshop.public.models import MenuItem, Page
 from flaskshop.dashboard.models import DashboardMenu, Setting
-from flaskshop.product.models import Category, Collection
+from flaskshop.product.models import Category, Collection, Product, ProductAttribute
 from flaskshop.checkout.models import ShippingMethod
 from flaskshop.plugin.models import PluginRegistry
 
@@ -20,7 +20,12 @@ from flaskshop.dashboard.forms import (
 
 def shipping_methods():
     page = request.args.get("page", type=int, default=1)
-    pagination = ShippingMethod.query.paginate(page, 10)
+    query = ShippingMethod.query
+    title = request.args.get("title", type=str)
+    if title:
+        query = query.filter(ShippingMethod.title.ilike(f"%{title}%"))
+
+    pagination = query.paginate(page, current_app.config["PAGINATION_ITEMS_PER_PAGE"])
     props = {
         "id": lazy_gettext("ID"),
         "title": lazy_gettext("Title"),
@@ -54,7 +59,11 @@ def shipping_methods_manage(id=None):
 
 def site_menus():
     page = request.args.get("page", type=int, default=1)
-    pagination = MenuItem.query.paginate(page, 10)
+    query = MenuItem.query
+    title = request.args.get("title", type=str)
+    if title:
+        query = query.filter(MenuItem.title.ilike(f"%{title}%"))
+    pagination = query.paginate(page, current_app.config["PAGINATION_ITEMS_PER_PAGE"])
     props = {
         "id": lazy_gettext("ID"),
         "title": lazy_gettext("Title"),
@@ -102,7 +111,11 @@ def site_menus_manage(id=None):
 
 def dashboard_menus():
     page = request.args.get("page", type=int, default=1)
-    pagination = DashboardMenu.query.paginate(page, 10)
+    query = DashboardMenu.query
+    title = request.args.get("title", type=str)
+    if title:
+        query = query.filter(DashboardMenu.title.ilike(f"%{title}%"))
+    pagination = query.paginate(page, current_app.config["PAGINATION_ITEMS_PER_PAGE"])
     props = {
         "id": lazy_gettext("ID"),
         "title": lazy_gettext("Title"),
@@ -140,7 +153,11 @@ def dashboard_menus_manage(id=None):
 
 def site_pages():
     page = request.args.get("page", type=int, default=1)
-    pagination = Page.query.paginate(page, 10)
+    query = Page.query
+    title = request.args.get("title", type=str)
+    if title:
+        query = query.filter(Page.title.ilike(f"%{title}%"))
+    pagination = query.paginate(page, current_app.config["PAGINATION_ITEMS_PER_PAGE"])
     props = {
         "id": lazy_gettext("ID"),
         "title": lazy_gettext("Title"),

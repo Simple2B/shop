@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm as _FlaskForm
 from flask_babel import lazy_gettext, gettext
+
 from flaskshop.constant import Permission
 
 from wtforms import (
@@ -15,7 +16,6 @@ from wtforms import (
     SelectMultipleField,
     FileField,
     FloatField,
-    DecimalField,
     DateTimeField,
 )
 from wtforms.validators import DataRequired, optional, NumberRange, Length
@@ -150,8 +150,8 @@ class ProductTypeForm(FlaskForm):
 
 
 class ProductForm(FlaskForm):
-    title = StringField(lazy_gettext("Title"))
-    basic_price = DecimalField(lazy_gettext("Basic Price"))
+    title = StringField(lazy_gettext("Title"), validators=[DataRequired()])
+    basic_price = FloatField(lazy_gettext("Basic Price"), validators=[DataRequired()])
     on_sale = BooleanField(lazy_gettext("On Sale"), default=True)
     is_featured = BooleanField(lazy_gettext("Is Featured"), default=False)
     rating = FloatField(lazy_gettext("Rating"), default=0)
@@ -159,7 +159,7 @@ class ProductForm(FlaskForm):
     review_count = IntegerField(lazy_gettext("Review Count"), default=0)
     category_id = SelectField(lazy_gettext("Category"))
     description = TextAreaField(lazy_gettext("Description"))
-    images = FieldList(StringField(lazy_gettext("Images")))  # TODO Add max image count
+    images = FieldList(StringField(lazy_gettext("Images")))
     attributes = FieldList(SelectField(lazy_gettext("Atributes")))
     submit = SubmitField(lazy_gettext("Submit"))
 
@@ -174,7 +174,7 @@ class VariantForm(FlaskForm):
         lazy_gettext("SKU"), validators=[DataRequired(), NumberRange(min=1, max=9999)]
     )
     title = StringField(lazy_gettext("Title"), validators=[DataRequired()])
-    price_override = DecimalField(
+    price_override = FloatField(
         lazy_gettext("Price override"), default=0.00, validators=[NumberRange(min=0)]
     )
     quantity = IntegerField(
@@ -185,7 +185,7 @@ class VariantForm(FlaskForm):
 
 class ShippingMethodForm(FlaskForm):
     title = StringField(lazy_gettext("Title"), validators=[DataRequired()])
-    price = DecimalField(
+    price = FloatField(
         lazy_gettext("Price"), default=0.00, validators=[NumberRange(min=0)]
     )
     submit = SubmitField(lazy_gettext("Submit"))
@@ -203,7 +203,7 @@ class VoucherForm(FlaskForm):
     used = IntegerField(lazy_gettext("Used"), default=0)
     validity_period = StringField(lazy_gettext("Validity Period"))
     discount_value_type = SelectField(lazy_gettext("Discount value type"), default=1)
-    discount_value = DecimalField(lazy_gettext("Discount value"), default=0.00)
+    discount_value = FloatField(lazy_gettext("Discount value"), default=0.00)
     limit = IntegerField(lazy_gettext("Limit"), validators=[optional()])
     category_id = SelectField(
         lazy_gettext("Category"),
@@ -219,7 +219,7 @@ class VoucherForm(FlaskForm):
 class SaleForm(FlaskForm):
     title = StringField(lazy_gettext("Title"), validators=[DataRequired()])
     discount_value_type = SelectField(lazy_gettext("Discount value type"), default=1)
-    discount_value = DecimalField(lazy_gettext("Discount value"), default=0.00)
+    discount_value = FloatField(lazy_gettext("Discount value"), default=0.00)
     categories = SelectMultipleField(lazy_gettext("Category"))
     products = SelectMultipleField(lazy_gettext("Product"))
     submit = SubmitField(lazy_gettext("Submit"))

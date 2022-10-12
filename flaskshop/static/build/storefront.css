@@ -11470,6 +11470,28 @@ a.btn {
     text-transform: none
 }
 
+.facebook-btn {
+    margin-top: 16px;
+}
+
+.btn.social-btn {
+    display: flex;
+    align-items: center;
+}
+
+.google {
+    height: 28px;
+    width: 101px;
+    border-radius: 15px;
+}
+
+.google-text {
+    margin-left: 2px;
+    color: white;
+    font-size: 70%;
+    font-weight: 900;
+}
+
 .btn.social-btn svg {
     vertical-align: text-bottom;
     border-right: 1px solid #fff;
@@ -11480,6 +11502,7 @@ a.btn {
 .btn.social-btn.facebook {
     background: #3b5998
 }
+
 
 .btn.social-btn.facebook:hover {
     background: #2d4373

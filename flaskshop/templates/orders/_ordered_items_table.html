@@ -87,7 +87,7 @@
         </div>
         <div class="col-4">
             <p class="float-right">
-                -${{ order.discount_amount  }}
+                -${{ order.discount_amount }}
             </p>
         </div>
     </div>
@@ -103,7 +103,7 @@
         </div>
         <div class="col-4">
             <p class="float-right">
-                ${{ order.total  }}
+                ${{ order.total }}
             </p>
         </div>
     </div>
@@ -121,10 +121,14 @@
         </div>
         {% if order.status_human == "unfulfilled" %}
         <div class="col-6">
-            <span class="float-right">{% trans %}Please pay before 00:30, else the order will auto closed{% endtrans %}</span>
-            <a href="{{ url_for('order.ali_pay', token=order.token) }}" class="btn btn-primary float-right">
-                {% trans %}Alipay{% endtrans %}
-            </a>
+            <!-- <a href="{{ url_for('order.stripe_pay', token=order.token) }}" class="btn btn-primary float-right"> -->
+
+            <form id="stripe-form">
+                <button class="btn btn-primary float-right">
+                    {% trans %}Pay with Stripe{% endtrans %}
+                </button>
+            </form>
+
             <a href="{{ url_for('order.test_pay', token=order.token) }}" class="btn secondary float-right">
                 {% trans %}Pay for test{% endtrans %}
             </a>
@@ -142,3 +146,26 @@
         {% endif %}
     </div>
 </div>
+
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+    var stripe = Stripe('{{ stripe_publishable_key }}');
+    var stripeForm = document.getElementById('stripe-form');
+
+    stripeForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const stripeSession = fetch("{{ url_for('order.stripe_pay') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ "token": "{{order.token }}" })
+        })
+            .then(r => r.json())
+            .then(function (response) {
+                stripe.redirectToCheckout({
+                    sessionId: response.session.id
+                })
+            })
+    });
+</script>

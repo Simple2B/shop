@@ -24,7 +24,7 @@ from flaskshop.settings import Config
 from flaskshop.plugin import spec, manager
 from flaskshop.plugin.models import PluginRegistry
 from flaskshop.utils import log_slow_queries, jinja_global_varibles
-
+from elasticsearch_dsl.connections import connections
 
 # flake8: noqa F401
 from .account import views as account_view
@@ -47,6 +47,7 @@ migrate = Migrate()
 def create_app(config_object=Config):
     app = Flask(__name__.split(".")[0])
     app.config.from_object(config_object)
+    config_object.configure(app)
     app.pluggy = manager.FlaskshopPluginManager("flaskshop")
     register_extensions(app)
     load_plugins(app)
@@ -59,6 +60,10 @@ def create_app(config_object=Config):
     app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {"/dashboard_api": dashboard_api})
     app.oauth = OAuth(app)
     app.mail = Mail(app)
+    es_connection = connections.create_connection(
+        hosts=[config_object.ES_URI],
+        http_auth=("elastic", config_object.ELASTIC_PASSWORD),
+    )
     return app
 
 
@@ -113,6 +118,8 @@ def register_commands(app):
     app.cli.add_command(commands.seed)
     app.cli.add_command(commands.flushrdb)
     app.cli.add_command(commands.reindex)
+    app.cli.add_command(commands.createsuperuser)
+    app.cli.add_command(commands.dropdb)
 
 
 def load_plugins(app):

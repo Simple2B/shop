@@ -1,5 +1,6 @@
 from datetime import datetime
-from flask import request, render_template
+
+from flask import request, render_template, current_app
 from flask_babel import lazy_gettext
 
 from flaskshop.order.models import Order
@@ -15,14 +16,14 @@ def orders():
         query = query.filter_by(status=status)
     order_no = request.args.get("order_number", type=str)
     if order_no:
-        query = query.filter(Order.token.like(f"%{order_no}%"))
+        query = query.filter(Order.token.ilike(f"%{order_no}%"))
     created_at = request.args.get("created_at", type=str)
     if created_at:
         start_date, end_date = created_at.split("-")
         start_date = datetime.strptime(start_date.strip(), "%m/%d/%Y")
         end_date = datetime.strptime(end_date.strip(), "%m/%d/%Y")
         query = query.filter(Order.created_at.between(start_date, end_date))
-    pagination = query.paginate(page, 10)
+    pagination = query.paginate(page, current_app.config["PAGINATION_ITEMS_PER_PAGE"])
     props = {
         "id": lazy_gettext("ID"),
         "identity": lazy_gettext("Identity"),

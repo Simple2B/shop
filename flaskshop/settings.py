@@ -26,11 +26,17 @@ class Config:
     GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
     FACEBOOK_APP_ID = os.getenv("FACEBOOK_APP_ID")
 
+    # STRIPE
+    STRIPE_PUBLISHABLE_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY")
+    STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
+
+    BASE_WEBSITE_URL = os.getenv("BASE_WEBSITE_URL", "https://dev-shop.simple2b.net/")
+
     # Elasticsearch
     # if elasticsearch is enabled, the home page will have a search bar
     # and while add a product, the search index will get update
     USE_ES = int(os.getenv("USE_ES", 0)) == 1
-    ES_HOSTS = [os.getenv("ESEARCH_URI")]
+    # ES_HOSTS = [os.getenv("ESEARCH_URI")]
     # SQLALCHEMY
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     DATABASE_QUERY_TIMEOUT = 0.1  # log the slow database query, and unit is second
@@ -39,10 +45,13 @@ class Config:
     APP_DIR = Path(__file__).parent  # This directory
     PROJECT_ROOT = APP_DIR.parent
     STATIC_DIR = APP_DIR / "static"
-    UPLOAD_FOLDER = "upload"
+
+    UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER", "static/uploads")
     UPLOAD_DIR = STATIC_DIR / UPLOAD_FOLDER
+    if not os.path.exists(UPLOAD_DIR):
+        os.makedirs(UPLOAD_DIR)
+
     DASHBOARD_TEMPLATE_FOLDER = APP_DIR / "templates" / "dashboard"
-    UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER", "static/placeholders")
     PURCHASE_URI = os.getenv("PURCHASE_URI", "")
     BCRYPT_LOG_ROUNDS = 13
 
@@ -73,11 +82,24 @@ class Config:
     GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
     FACEBOOK_APP_ID = os.getenv("FACEBOOK_APP_ID")
 
+    ELASTIC_PASSWORD = os.getenv("ELASTIC_PASSWORD")
+
+    PAGINATION_ITEMS_PER_PAGE = int(os.getenv("PAGINATION_ITEMS_PER_PAGE", 10))
+
+    @classmethod
+    def configure(cls, app):
+        import stripe
+
+        stripe.api_key = cls.STRIPE_SECRET_KEY
+
 
 class TestConfig(Config):
+    ENV = "testing"
     SQLALCHEMY_DATABASE_URI = "sqlite:///" + str(
         (Path(__file__).parent.parent / "database-test.sqlite3")
     )
+    ES_URI = "FakePath"
+
     DEBUG = True
     WTF_CSRF_ENABLED = False
     DEBUG_TB_ENABLED = int(os.getenv("FLASK_DEBUG", 0)) == 1
@@ -98,6 +120,7 @@ class DevConfig(Config):
         "DB_URI_DEV",
         "sqlite:///" + str((Path(__file__).parent.parent / "database-test.sqlite3")),
     )
+    ES_URI = os.getenv("ESEARCH_URI_DEV")
 
 
 class ProdConfig(Config):
@@ -105,6 +128,10 @@ class ProdConfig(Config):
     DEBUG = False
     DEBUG_TB_ENABLED = False
     SQLALCHEMY_DATABASE_URI = os.getenv("DB_URI_PROD")
+    ES_URI = os.getenv("ESEARCH_URI_PROD")
 
 
-config = {config_class.ENV: config_class for config_class in (DevConfig, ProdConfig)}
+config = {
+    config_class.ENV: config_class
+    for config_class in (DevConfig, ProdConfig, TestConfig)
+}
