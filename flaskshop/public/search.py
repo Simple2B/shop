@@ -41,23 +41,16 @@ class Item(Document):
 
     @classmethod
     def add(cls, item):
-        obj = cls(**get_item_data(item))
+        obj = cls(meta={"id": item.id}, **get_item_data(item))
         obj.save()
         return obj
 
     @classmethod
     def update_item(cls, item):
-        try:
-            obj = cls.get(item.id)
-        except NotFoundError:
-            return cls.add(item)
+        obj = cls.get(item.id)
 
         kw = get_item_data(item)
-        try:
-            obj.update(**kw)
-        except ConflictError:
-            obj = cls.get(item.id)
-            obj.update(**kw)
+        obj.update(**kw)
         return True
 
     @classmethod
