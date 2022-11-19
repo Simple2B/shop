@@ -14,7 +14,7 @@ from sqlalchemy import Column, Integer, DateTime, event
 from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 import arrow
 
-from flaskshop.corelib.db import PropsItem, PropsMixin
+from flaskshop.corelib.redis import PropsItem, PropsMixin
 
 bcrypt = Bcrypt()
 csrf_protect = CSRFProtect()

@@ -20,13 +20,11 @@ from flaskshop.extensions import (
     migrate,
     bootstrap,
 )
-from flaskshop.settings import Config
+from flaskshop.settings import CONFIG_MAP, Config
 from flaskshop.plugin import spec, manager
 from flaskshop.plugin.models import PluginRegistry
 from flaskshop.utils import log_slow_queries, jinja_global_varibles
 
-
-# flake8: noqa F401
 from .account import views as account_view
 from .checkout import views as checkout_view
 from .discount import views as discount_view
@@ -44,13 +42,30 @@ ckeditor = CKEditor()
 migrate = Migrate()
 
 
-def create_app(config_object=Config):
+def create_app(environment="dev"):
+    config: Config = CONFIG_MAP[environment]
+
     app = Flask(__name__.split(".")[0])
-    app.config.from_object(config_object)
+    app.config.from_object(config)
+
+    # What is this for?
     app.pluggy = manager.FlaskshopPluginManager("flaskshop")
-    register_extensions(app)
+
+    for ext in (
+        bcrypt,
+        db,
+        csrf_protect,
+        login_manager,
+        debug_toolbar,
+        migrate,
+        bootstrap,
+        babel,
+        ckeditor,
+    ):
+        ext.init_app(app)
+
     load_plugins(app)
-    register_blueprints(app)
+    app.pluggy.hook.flaskshop_load_blueprints(app=app)
     register_errorhandlers(app)
     register_shellcontext(app)
     register_commands(app)
@@ -60,23 +75,6 @@ def create_app(config_object=Config):
     app.oauth = OAuth(app)
     app.mail = Mail(app)
     return app
-
-
-def register_extensions(app):
-    bcrypt.init_app(app)
-    db.init_app(app)
-    csrf_protect.init_app(app)
-    login_manager.init_app(app)
-    debug_toolbar.init_app(app)
-    migrate.init_app(app, db)
-    bootstrap.init_app(app)
-    babel.init_app(app)
-    ckeditor.init_app(app)
-    migrate.init_app(app, db)
-
-
-def register_blueprints(app):
-    app.pluggy.hook.flaskshop_load_blueprints(app=app)
 
 
 def register_errorhandlers(app):
@@ -130,5 +128,6 @@ def load_plugins(app):
                 if not plugin.enabled:
                     app.pluggy.set_blocked(plugin.name)
     except:
+        # TODO Remove this crap
         # when db migrate raise exception
         pass

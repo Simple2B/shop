@@ -66,7 +66,7 @@ def update_url_query(url, params):
 
 
 class Empty:
-    """区分从缓存中拿到的值本身就是空对象 还是没有拿到值"""
+    """区分从缓存中拿到的值本身就是空对象 还是没有拿到值"""  # WTF??
 
     def __call__(self, *a, **kw):
         return empty

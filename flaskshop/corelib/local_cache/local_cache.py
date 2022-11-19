@@ -44,6 +44,3 @@ class LocalCache:
 
             return func2
         raise AttributeError(name)
-
-
-lc = LocalCache()

@@ -1,7 +1,7 @@
 import logging
 
 import pluggy
-from pkg_resources import iter_entry_points, DistributionNotFound
+from pkg_resources import iter_entry_points, DistributionNotFound, VersionConflict
 
 # flake8: noqa 401
 from .models import PluginRegistry

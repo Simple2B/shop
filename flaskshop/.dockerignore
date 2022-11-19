@@ -1,2 +1,6 @@
+.github/
+.vscode/
+.venv/
 .env
+.prod.env
 node_modules/

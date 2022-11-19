@@ -75,6 +75,7 @@ class Config:
 
 
 class TestConfig(Config):
+    ENV = "test"
     SQLALCHEMY_DATABASE_URI = "sqlite:///" + str(
         (Path(__file__).parent.parent / "database-test.sqlite3")
     )
@@ -87,7 +88,7 @@ class TestConfig(Config):
 
 
 class DevConfig(Config):
-    ENV = "development"
+    ENV = "dev"
     DEBUG = True
     DEBUG_TB_ENABLED = int(os.getenv("FLASK_DEBUG", 0)) == 1
     DEBUG_TB_INTERCEPT_REDIRECTS = False
@@ -101,10 +102,13 @@ class DevConfig(Config):
 
 
 class ProdConfig(Config):
-    ENV = "production"
+    ENV = "prod"
     DEBUG = False
     DEBUG_TB_ENABLED = False
     SQLALCHEMY_DATABASE_URI = os.getenv("DB_URI_PROD")
 
 
-config = {config_class.ENV: config_class for config_class in (DevConfig, ProdConfig)}
+CONFIG_MAP = {
+    config_class.ENV: config_class
+    for config_class in (TestConfig, DevConfig, ProdConfig)
+}

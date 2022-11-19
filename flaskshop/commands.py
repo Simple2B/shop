@@ -22,7 +22,7 @@ from flaskshop.random_data import (
     create_roles,
 )
 from flaskshop.extensions import db
-from flaskshop.corelib.db import rdb
+from flaskshop.corelib.redis import rdb
 from flaskshop.public.search import Item
 from flaskshop.product.models import Product
 

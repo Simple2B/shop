@@ -5,8 +5,8 @@ from pickle import UnpicklingError
 from flask import request, current_app
 from sqlalchemy.ext.serializer import loads, dumps
 
-from flaskshop.corelib.db import rdb
-from flaskshop.corelib.utils import Empty, empty
+from ..corelib import rdb
+from .utils import Empty, empty
 
 BUILTIN_TYPES = (int, bytes, str, float, bool)
 
