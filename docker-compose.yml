@@ -31,10 +31,12 @@ services:
         limits:
           memory: 300m
     environment:
-      node.name: flaskshop
-      cluster.name: flaskshop_cluster
+      node.name: simple2bshop
+      cluster.name: simple2bshop_cluster
       discovery.type: single-node
       ELASTIC_PASSWORD: "${ELASTIC_PASSWORD}"
+      xpack.security.enabled: "false"
+
     volumes:
       - es-data:/usr/share/elasticsearch/data
     ports:

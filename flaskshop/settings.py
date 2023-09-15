@@ -120,7 +120,7 @@ class DevConfig(Config):
         "DB_URI_DEV",
         "sqlite:///" + str((Path(__file__).parent.parent / "database-test.sqlite3")),
     )
-    ES_URI = os.getenv("ESEARCH_URI_DEV")
+    ES_URI = os.getenv("ESEARCH_URI_DEV", "http://es:9200")
 
 
 class ProdConfig(Config):
@@ -128,7 +128,7 @@ class ProdConfig(Config):
     DEBUG = False
     DEBUG_TB_ENABLED = False
     SQLALCHEMY_DATABASE_URI = os.getenv("DB_URI_PROD")
-    ES_URI = os.getenv("ESEARCH_URI_PROD")
+    ES_URI = os.getenv("ESEARCH_URI_PROD", "http://es:9200")
 
 
 config = {

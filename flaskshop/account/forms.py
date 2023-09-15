@@ -1,7 +1,13 @@
 # -*- coding: utf-8 -*-
 """User forms."""
 from flask_wtf import FlaskForm
-from wtforms import PasswordField, StringField, SubmitField, ValidationError
+from wtforms import (
+    PasswordField,
+    StringField,
+    SubmitField,
+    ValidationError,
+    IntegerField,
+)
 from wtforms.validators import DataRequired, Email, EqualTo, Length
 from flask_babel import lazy_gettext
 
@@ -146,6 +152,7 @@ class AddressForm(FlaskForm):
         validators=[DataRequired(), Length(min=10, max=13)],
         render_kw={"placeholder": "Set your phone number..."},
     )
+    # shipping_methods = IntegerField(lazy_gettext("Shipping Methods"),)
 
     def __init__(self, *args, **kwargs):
         """Create instance."""

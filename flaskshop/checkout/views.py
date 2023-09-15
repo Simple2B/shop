@@ -69,12 +69,12 @@ def checkout_shipping():
                 contact_phone=form.contact_phone.data,
                 user_id=current_user.id,
             )
-        shipping_method = ShippingMethod.get_by_id(request.form["shipping_method"])
-        if user_address and shipping_method:
+        # shipping_method = ShippingMethod.get_by_id(request.form["shipping_method"])
+        if user_address:
             cart = Cart.get_current_user_cart()
             cart.update(
                 shipping_address_id=user_address.id,
-                shipping_method_id=shipping_method.id,
+                # shipping_method_id=shipping_method.id,
             )
             return redirect(url_for("checkout.checkout_note"))
     flash_errors(form)

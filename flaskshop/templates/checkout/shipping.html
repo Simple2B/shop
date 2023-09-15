@@ -42,17 +42,12 @@
         <h2>{% trans %}Shipping method{% endtrans %}</h2>
         <br>
       </div>
-      {% for method in shipping_methods %}
-      <div class="radio col-6 float-left">
-        <label>
-          <input type="radio" name="shipping_method" value="{{ method.id }}" id="shipping_{{ method.id }}" {% if
-            loop.first %}checked{%endif%}>
-          <div class="address-details">
-            {{ method }}
-          </div>
-        </label>
-      </div>
-      {% endfor %}
+
+
+
+
+
+
     </div>
   </div>
   <p class="text-md-right">
@@ -61,6 +56,7 @@
     </button>
   </p>
 </form>
+
 <script>
   const btnSubmit = document.querySelector('[type=submit]');
   const radioBtns = document.querySelectorAll('input[name=address_sel]');
